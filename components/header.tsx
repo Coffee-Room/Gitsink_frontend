@@ -1,15 +1,23 @@
 import Link from "next/link"
-import { Code } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import MobileMenu from "@/components/mobile-menu"
 
 export default function Header() {
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Code className="h-6 w-6 text-primary" />
-          <span className="text-xl font-bold">Gitsink</span>
+      <div className="container flex h-20 items-center justify-between py-3">
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center -ml-3">
+            <Image
+              src="/images/gitsink-logo-wordmark.png"
+              alt="Gitsink Logo"
+              width={220}
+              height={70}
+              className="h-10 sm:h-12 w-auto"
+              priority
+            />
+          </Link>
         </div>
         <nav className="hidden md:flex gap-6">
           <Link
@@ -38,7 +46,7 @@ export default function Header() {
           </Link>
         </nav>
         <div className="flex items-center gap-2">
-          <Button className="hidden md:inline-flex">Join Waitlist</Button>
+          <Button className="hidden md:inline-flex bg-black hover:bg-black/90 text-white">Join Waitlist</Button>
           <MobileMenu />
         </div>
       </div>

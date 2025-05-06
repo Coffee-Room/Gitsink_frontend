@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useReducedMotion } from "@/hooks/use-reduced-motion"
 
 interface UseScrollRevealOptions {
   threshold?: number
@@ -21,6 +22,7 @@ export function useScrollReveal({
 }: UseScrollRevealOptions = {}) {
   const ref = useRef<HTMLElement | null>(null)
   const [isRevealed, setIsRevealed] = useState(false)
+  const prefersReducedMotion = useReducedMotion()
 
   useEffect(() => {
     const element = ref.current
@@ -56,46 +58,45 @@ export function useScrollReveal({
     }
   }, [threshold, rootMargin, triggerOnce, delay])
 
+  // If user prefers reduced motion, only use fade animation with shorter duration
+  const effectiveAnimation = prefersReducedMotion ? "fade" : animation
+  const effectiveDuration = prefersReducedMotion ? Math.min(duration, 300) : duration
+
   const getInitialStyles = () => {
-    switch (animation) {
+    // If user prefers reduced motion, use minimal initial styles
+    if (prefersReducedMotion) {
+      return { opacity: 0 }
+    }
+
+    switch (effectiveAnimation) {
       case "fade":
         return { opacity: 0 }
       case "slide-up":
-        return { opacity: 0, transform: "translateY(50px)" }
+        return { opacity: 0, transform: "translateY(30px)" }
       case "slide-down":
-        return { opacity: 0, transform: "translateY(-50px)" }
+        return { opacity: 0, transform: "translateY(-30px)" }
       case "slide-left":
-        return { opacity: 0, transform: "translateX(50px)" }
+        return { opacity: 0, transform: "translateX(30px)" }
       case "slide-right":
-        return { opacity: 0, transform: "translateX(-50px)" }
+        return { opacity: 0, transform: "translateX(-30px)" }
       case "zoom":
-        return { opacity: 0, transform: "scale(0.8)" }
+        return { opacity: 0, transform: "scale(0.9)" }
       case "rotate":
-        return { opacity: 0, transform: "rotate(-10deg)" }
+        return { opacity: 0, transform: "rotate(-5deg)" }
       default:
         return { opacity: 0 }
     }
   }
 
   const getFinalStyles = () => {
-    switch (animation) {
-      case "fade":
-      case "slide-up":
-      case "slide-down":
-      case "slide-left":
-      case "slide-right":
-      case "zoom":
-      case "rotate":
-        return { opacity: 1, transform: "none" }
-      default:
-        return { opacity: 1 }
-    }
+    return { opacity: 1, transform: "none" }
   }
 
   const style = {
     ...getInitialStyles(),
-    transition: `all ${duration}ms ease-out ${delay}ms`,
+    transition: `all ${effectiveDuration}ms ease-out ${delay}ms`,
     ...(isRevealed ? getFinalStyles() : {}),
+    willChange: "opacity, transform",
   }
 
   return { ref, style, isRevealed }

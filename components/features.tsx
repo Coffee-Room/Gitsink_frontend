@@ -4,8 +4,11 @@ import type React from "react"
 import { RefreshCw, Zap, Key } from "lucide-react"
 import ScrollReveal from "@/components/scroll-reveal"
 import StaggeredItems from "@/components/staggered-items"
+import { useIsMobile } from "@/hooks/use-is-mobile"
 
 export default function Features() {
+  const isMobile = useIsMobile()
+
   return (
     <section id="features" className="py-12 md:py-20">
       <div className="container px-4 md:px-6">
@@ -16,8 +19,8 @@ export default function Features() {
         </ScrollReveal>
 
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
-          <StaggeredItems baseDelay={300} delayIncrement={200}>
-            <ScrollReveal animation="slide-up">
+          <StaggeredItems baseDelay={isMobile ? 100 : 300} delayIncrement={isMobile ? 50 : 200}>
+            <ScrollReveal animation={isMobile ? "fade" : "slide-up"}>
               <FeatureCard
                 icon={<RefreshCw className="h-8 w-8 text-primary" />}
                 title="Auto-sync"
@@ -25,7 +28,7 @@ export default function Features() {
               />
             </ScrollReveal>
 
-            <ScrollReveal animation="slide-up">
+            <ScrollReveal animation={isMobile ? "fade" : "slide-up"}>
               <FeatureCard
                 icon={<Zap className="h-8 w-8 text-primary" />}
                 title="Fast API"
@@ -33,7 +36,7 @@ export default function Features() {
               />
             </ScrollReveal>
 
-            <ScrollReveal animation="slide-up" className="sm:col-span-2 md:col-span-1">
+            <ScrollReveal animation={isMobile ? "fade" : "slide-up"} className="sm:col-span-2 md:col-span-1">
               <FeatureCard
                 icon={<Key className="h-8 w-8 text-primary" />}
                 title="Simple Integration"

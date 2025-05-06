@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
@@ -24,7 +25,15 @@ export default function MobileMenu() {
       <SheetContent side="right" className="w-[300px] sm:w-[400px]">
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between border-b pb-4">
-            <div className="font-bold text-lg">Menu</div>
+            <div className="flex items-center">
+              <Image
+                src="/images/gitsink-logo-wordmark.png"
+                alt="Gitsink Logo"
+                width={140}
+                height={40}
+                className="h-8 w-auto"
+              />
+            </div>
             <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
               <X className="h-5 w-5" />
               <span className="sr-only">Close menu</span>
@@ -61,7 +70,7 @@ export default function MobileMenu() {
             </Link>
           </nav>
           <div className="mt-auto pt-6 border-t">
-            <Button className="w-full" onClick={() => setOpen(false)}>
+            <Button className="w-full bg-black hover:bg-black/90 text-white" onClick={() => setOpen(false)}>
               Join Waitlist
             </Button>
           </div>
