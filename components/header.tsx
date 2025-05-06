@@ -13,8 +13,8 @@ export default function Header() {
               src="/images/gitsink-logo-wordmark.png"
               alt="Gitsink Logo"
               width={220}
-              height={70}
-              className="h-10 sm:h-12 w-auto"
+              height={100}
+              className="h-22 sm:h-20 w-auto"
               priority
             />
           </Link>
