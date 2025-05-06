@@ -57,3 +57,16 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Fix for code blocks to ensure they use the correct text color */
+pre,
+code {
+  @apply text-foreground;
+}
+
+/* Additional responsive utilities */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

@@ -5,10 +5,10 @@ import ScrollReveal from "@/components/scroll-reveal"
 
 export default function Faq() {
   return (
-    <section id="faq" className="py-20 bg-muted/50">
-      <div className="container">
+    <section id="faq" className="py-12 md:py-20 bg-muted/50">
+      <div className="container px-4 md:px-6">
         <ScrollReveal animation="fade">
-          <h2 className="text-center text-3xl font-bold tracking-tight sm:text-4xl mb-16">
+          <h2 className="text-center text-2xl md:text-3xl font-bold tracking-tight sm:text-4xl mb-8 md:mb-16">
             Frequently Asked Questions
           </h2>
         </ScrollReveal>
@@ -48,7 +48,7 @@ interface FaqItemProps {
 function FaqItem({ value, question, answer }: FaqItemProps) {
   return (
     <AccordionItem value={value}>
-      <AccordionTrigger>{question}</AccordionTrigger>
+      <AccordionTrigger className="text-left">{question}</AccordionTrigger>
       <AccordionContent>{answer}</AccordionContent>
     </AccordionItem>
   )

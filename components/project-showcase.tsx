@@ -1,23 +1,24 @@
 "use client"
-
-import AnimatedSection from "@/components/animated-section"
 import AnimatedCounter from "@/components/animated-counter"
 import StaggeredItems from "@/components/staggered-items"
+import ScrollReveal from "@/components/scroll-reveal"
 
 export default function ProjectShowcase() {
   return (
-    <section className="py-20">
-      <div className="container">
-        <AnimatedSection>
-          <h2 className="text-center text-3xl font-bold tracking-tight sm:text-4xl mb-16">Showcase Your Projects</h2>
-        </AnimatedSection>
+    <section className="py-12 md:py-20">
+      <div className="container px-4 md:px-6">
+        <ScrollReveal animation="fade">
+          <h2 className="text-center text-2xl md:text-3xl font-bold tracking-tight sm:text-4xl mb-8 md:mb-16">
+            Showcase Your Projects
+          </h2>
+        </ScrollReveal>
 
-        <AnimatedSection delay={400}>
+        <ScrollReveal animation="fade" delay={400}>
           <div className="mx-auto max-w-4xl">
-            <div className="rounded-lg border bg-card p-6 shadow-lg">
-              <div className="grid gap-6 md:grid-cols-2">
+            <div className="rounded-lg border bg-card p-4 md:p-6 shadow-lg">
+              <div className="grid gap-6 sm:grid-cols-2">
                 <StaggeredItems baseDelay={600} delayIncrement={200}>
-                  <AnimatedSection>
+                  <ScrollReveal animation="slide-up">
                     <ProjectCard
                       name="awesome-project"
                       description="A revolutionary dev tool"
@@ -25,9 +26,9 @@ export default function ProjectShowcase() {
                       stars={128}
                       updatedDate="Apr 15, 2023"
                     />
-                  </AnimatedSection>
+                  </ScrollReveal>
 
-                  <AnimatedSection>
+                  <ScrollReveal animation="slide-up">
                     <ProjectCard
                       name="another-cool-repo"
                       description="Simplify your workflow"
@@ -35,12 +36,12 @@ export default function ProjectShowcase() {
                       stars={84}
                       updatedDate="Mar 22, 2023"
                     />
-                  </AnimatedSection>
+                  </ScrollReveal>
                 </StaggeredItems>
               </div>
             </div>
           </div>
-        </AnimatedSection>
+        </ScrollReveal>
       </div>
     </section>
   )
@@ -64,7 +65,7 @@ function ProjectCard({ name, description, language, stars, updatedDate }: Projec
   }
 
   return (
-    <div className="rounded-md border bg-background p-4">
+    <div className="rounded-md border bg-background p-4 h-full">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold">{name}</h3>
         <span className={`rounded-full px-2 py-1 text-xs font-medium ${getLanguageColor(language)}`}>{language}</span>
