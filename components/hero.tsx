@@ -9,7 +9,7 @@ import AnimatedSection from "@/components/animated-section"
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden py-16 md:py-20 lg:py-32">
+    <section className="relative overflow-hidden py-16 md:py=20 lg:py-32">
       <div className="absolute inset-0 bg-gradient-to-br from-background to-background via-primary/5"></div>
       <div className="container px-4 md:px-6 relative z-10">
         <div className="mx-auto max-w-3xl text-center">
@@ -32,7 +32,7 @@ export default function Hero() {
 
           <AnimatedSection delay={1200}>
             <div className="mt-8 md:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-black/90 text-white">
                 Join the Waitlist <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button variant="outline" size="lg" className="w-full sm:w-auto">
