@@ -1,0 +1,61 @@
+"use client"
+
+import type React from "react"
+
+import { Users, Star, Code } from "lucide-react"
+import ScrollReveal from "@/components/scroll-reveal"
+import ScrollCounter from "@/components/scroll-counter"
+
+export default function StatsSection() {
+  return (
+    <section className="py-16 bg-primary/5">
+      <div className="container">
+        <ScrollReveal animation="fade">
+          <h2 className="text-center text-3xl font-bold tracking-tight sm:text-4xl mb-12">Trusted by Developers</h2>
+        </ScrollReveal>
+
+        <div className="grid gap-8 md:grid-cols-3">
+          <ScrollReveal animation="slide-up" delay={100}>
+            <StatCard
+              icon={<Users className="h-8 w-8 text-primary" />}
+              value={<ScrollCounter end={5000} suffix="+" className="text-4xl font-bold" />}
+              label="Active Users"
+            />
+          </ScrollReveal>
+
+          <ScrollReveal animation="slide-up" delay={300}>
+            <StatCard
+              icon={<Star className="h-8 w-8 text-primary" />}
+              value={<ScrollCounter end={10000} suffix="+" className="text-4xl font-bold" />}
+              label="GitHub Stars"
+            />
+          </ScrollReveal>
+
+          <ScrollReveal animation="slide-up" delay={500}>
+            <StatCard
+              icon={<Code className="h-8 w-8 text-primary" />}
+              value={<ScrollCounter end={25000} suffix="+" className="text-4xl font-bold" />}
+              label="Projects Showcased"
+            />
+          </ScrollReveal>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+interface StatCardProps {
+  icon: React.ReactNode
+  value: React.ReactNode
+  label: string
+}
+
+function StatCard({ icon, value, label }: StatCardProps) {
+  return (
+    <div className="flex flex-col items-center text-center p-6 bg-background rounded-lg shadow-sm">
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">{icon}</div>
+      <div className="mt-2">{value}</div>
+      <p className="mt-1 text-muted-foreground">{label}</p>
+    </div>
+  )
+}
