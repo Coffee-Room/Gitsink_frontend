@@ -8,13 +8,13 @@ export default function Header() {
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-20 items-center justify-between py-3">
         <div className="flex items-center">
-          <Link href="/" className="flex items-center -ml-3">
+          <Link href="/" className="flex items-center">
             <Image
               src="/images/gitsink-logo-wordmark.png"
               alt="Gitsink Logo"
-              width={220}
-              height={100}
-              className="h-22 sm:h-20 w-auto"
+              width={160}
+              height={40}
+              className="h-10 w-auto"
               priority
             />
           </Link>
