@@ -16,18 +16,19 @@ export default function ApiExample() {
 
         <div className="grid gap-6 md:gap-8 lg:grid-cols-2">
           <ScrollReveal animation="slide-right" delay={200}>
-            <div className="rounded-lg bg-black p-4 md:p-6 shadow-lg overflow-x-auto">
-              <pre className="text-xs sm:text-sm text-green-400">
-                <code>{`curl https://api.gitsink.dev/user/projects \\
-  -H "Authorization: Bearer <your-api-key>"`}</code>
+            <div className="rounded-lg bg-zinc-900 p-4 md:p-6 shadow-lg overflow-x-auto">
+              <pre className="text-xs sm:text-sm text-green-400 whitespace-pre-wrap sm:whitespace-pre overflow-visible">
+                <code className="text-green-400 font-mono">
+                  curl https://api.gitsink.dev/user/projects \ -H "Authorization: Bearer &lt;your-api-key&gt;"
+                </code>
               </pre>
             </div>
           </ScrollReveal>
 
           <ScrollReveal animation="slide-left" delay={400}>
-            <div className="rounded-lg bg-black p-4 md:p-6 shadow-lg overflow-x-auto">
-              <pre className="text-xs sm:text-sm text-blue-400">
-                <code>{`{
+            <div className="rounded-lg bg-zinc-900 p-4 md:p-6 shadow-lg overflow-x-auto">
+              <pre className="text-xs sm:text-sm text-blue-400 whitespace-pre-wrap sm:whitespace-pre overflow-visible">
+                <code className="text-blue-400 font-mono">{`{
   "projects": [
     {
       "name": "awesome-project",
