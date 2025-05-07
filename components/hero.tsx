@@ -91,19 +91,19 @@ export default function Hero() {
 
   return (
     <section className="relative overflow-hidden py-16 md:py-20 lg:py-32">
-      <div className="absolute inset-0 bg-gradient-to-br from-background to-background via-primary/5"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 dark:from-blue-950/20 to-background via-blue-100/20 dark:via-blue-900/10"></div>
       <div className="container px-4 md:px-6 relative z-10">
         <div className="mx-auto max-w-3xl text-center">
           <AnimatedSection delay={isMobile ? 0 : 200}>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight">
               {isMobile ? (
                 <>
-                  Showcase Your GitHub Projects — <span className="text-primary">Instantly</span>.
+                  Showcase Your GitHub Projects — <span className="text-blue-600 dark:text-blue-400">Instantly</span>.
                 </>
               ) : (
                 <>
                   <AnimatedText text="Showcase Your GitHub Projects —" speed={30} />{" "}
-                  <span className="text-primary">
+                  <span className="text-blue-600 dark:text-blue-400">
                     <AnimatedText text="Instantly" speed={50} delay={1500} />
                   </span>
                   .
@@ -143,7 +143,7 @@ export default function Hero() {
                 {/* Browser Tabs */}
                 <div className="flex items-center">
                   <div className="flex items-center bg-white dark:bg-gray-900 rounded-t-lg border-b-0 border border-gray-200 dark:border-gray-700 px-4 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300">
-                    <div className="w-3 h-3 bg-primary rounded-full mr-2"></div>
+                    <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
                     api.gitsink.dev
                   </div>
                   <div className="ml-2 flex items-center bg-gray-200 dark:bg-gray-700 rounded-t-lg px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 opacity-80">
@@ -177,7 +177,9 @@ export default function Hero() {
               <div className="bg-white dark:bg-gray-900">
                 {/* API Response Tab UI */}
                 <div className="flex border-b border-gray-200 dark:border-gray-700 px-4 pt-3 text-sm">
-                  <div className="border-b-2 border-primary pb-2 px-2 text-primary font-medium">Response</div>
+                  <div className="border-b-2 border-blue-500 pb-2 px-2 text-blue-600 dark:text-blue-400 font-medium">
+                    Response
+                  </div>
                   <div className="pb-2 px-2 text-gray-500 dark:text-gray-400">Headers</div>
                   <div className="pb-2 px-2 text-gray-500 dark:text-gray-400">Curl</div>
                 </div>
@@ -204,7 +206,7 @@ export default function Hero() {
                 {/* Browser Tabs */}
                 <div className="flex items-center">
                   <div className="flex items-center bg-white dark:bg-gray-900 rounded-t-lg border-b-0 border border-gray-200 dark:border-gray-700 px-4 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300">
-                    <div className="w-3 h-3 bg-primary rounded-full mr-2"></div>
+                    <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
                     api.gitsink.dev
                   </div>
                   <div className="ml-2 flex items-center bg-gray-200 dark:bg-gray-700 rounded-t-lg px-3 py-1.5 text-xs font-medium text-gray-500 dark:text-gray-400 opacity-80">
@@ -238,7 +240,9 @@ export default function Hero() {
               <div className="bg-white dark:bg-gray-900">
                 {/* API Response Tab UI */}
                 <div className="flex border-b border-gray-200 dark:border-gray-700 px-4 pt-3 text-sm">
-                  <div className="border-b-2 border-primary pb-2 px-2 text-primary font-medium">Response</div>
+                  <div className="border-b-2 border-blue-500 pb-2 px-2 text-blue-600 dark:text-blue-400 font-medium">
+                    Response
+                  </div>
                   <div className="pb-2 px-2 text-gray-500 dark:text-gray-400">Headers</div>
                   <div className="pb-2 px-2 text-gray-500 dark:text-gray-400">Curl</div>
                 </div>

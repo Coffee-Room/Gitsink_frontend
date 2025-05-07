@@ -12,42 +12,10 @@ export function middleware(request: NextRequest) {
   // Get response to modify
   const response = NextResponse.next()
 
-  // Add security headers
-  const nonce = Buffer.from(crypto.randomUUID()).toString("base64")
-
-  // Content Security Policy
-  const cspHeader = `
-    default-src 'self';
-    script-src 'self' 'nonce-${nonce}' 'strict-dynamic';
-    style-src 'self' 'unsafe-inline';
-    img-src 'self' blob: data:;
-    font-src 'self';
-    object-src 'none';
-    base-uri 'self';
-    form-action 'self';
-    frame-ancestors 'none';
-    block-all-mixed-content;
-    upgrade-insecure-requests;
-  `
-    .replace(/\s{2,}/g, " ")
-    .trim()
-
-  // Add security headers
-  const securityHeaders = {
-    "Content-Security-Policy": cspHeader,
-    "X-XSS-Protection": "1; mode=block",
-    "X-Frame-Options": "DENY",
-    "X-Content-Type-Options": "nosniff",
-    "Referrer-Policy": "strict-origin-when-cross-origin",
-    "Permissions-Policy": "camera=(), microphone=(), geolocation=(), interest-cohort=()",
-    "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload",
-    "X-DNS-Prefetch-Control": "on",
-  }
-
-  // Add security headers to response
-  Object.entries(securityHeaders).forEach(([key, value]) => {
-    response.headers.set(key, value)
-  })
+  // Add basic security headers
+  response.headers.set("X-Frame-Options", "DENY")
+  response.headers.set("X-Content-Type-Options", "nosniff")
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin")
 
   // Check if we're in maintenance mode
   if (MAINTENANCE_MODE) {

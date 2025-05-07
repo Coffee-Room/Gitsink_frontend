@@ -22,7 +22,9 @@ export default function Footer() {
           <p className="text-center text-sm text-muted-foreground md:text-left">Made by developers for developers.</p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="#"
+              href="https://github.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-all duration-200 hover:scale-110"
             >
               <Github className="h-5 w-5" />
@@ -45,12 +47,6 @@ export default function Footer() {
               className="text-sm text-muted-foreground hover:text-foreground transition-all duration-200 relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all hover:after:w-full"
             >
               Policies
-            </Link>
-            <Link
-              href="/policies#terms"
-              className="text-sm text-muted-foreground hover:text-foreground transition-all duration-200 relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all hover:after:w-full"
-            >
-              Terms
             </Link>
           </div>
         </div>
