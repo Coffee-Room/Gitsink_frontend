@@ -9,6 +9,17 @@ import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle2, Share2 } from "lucide-react"
 import { joinWaitlist, generateWaitlistFormToken } from "@/app/actions/waitlist"
+import {
+  trackConversionStart,
+  trackConversionStep,
+  trackConversionComplete,
+  trackConversionAbandon,
+  ConversionGoal,
+  FunnelStep,
+  EventCategory,
+  EventName,
+  trackEvent,
+} from "@/lib/analytics"
 
 export default function WaitlistForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -18,6 +29,14 @@ export default function WaitlistForm() {
     message?: string
     errors?: Record<string, string[]>
   }>({})
+  const [formStarted, setFormStarted] = useState(false)
+  const [formFields, setFormFields] = useState({
+    email: false,
+    name: false,
+    company: false,
+    githubUsername: false,
+    referralSource: false,
+  })
 
   useEffect(() => {
     // Generate CSRF token when component mounts
@@ -30,12 +49,62 @@ export default function WaitlistForm() {
       }
     }
     getToken()
-  }, [])
+
+    // Track conversion start when form is viewed
+    trackConversionStart(ConversionGoal.WAITLIST_SIGNUP, FunnelStep.INTENT, {
+      form: "waitlist",
+      source: document.referrer || "direct",
+    })
+
+    // Track form abandonment
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!formStatus.success && formStarted) {
+        trackConversionAbandon(ConversionGoal.WAITLIST_SIGNUP, FunnelStep.INTENT, "page_exit", {
+          form: "waitlist",
+          fields_completed: Object.values(formFields).filter(Boolean).length,
+        })
+      }
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [formStarted, formFields, formStatus.success])
+
+  const handleFieldFocus = (field: keyof typeof formFields) => {
+    if (!formStarted) {
+      setFormStarted(true)
+      trackConversionStep(ConversionGoal.WAITLIST_SIGNUP, FunnelStep.INTENT, "form_started", 1, 3, { field })
+    }
+
+    if (!formFields[field]) {
+      setFormFields((prev) => ({ ...prev, [field]: true }))
+
+      // Count completed fields
+      const completedFields = Object.values({ ...formFields, [field]: true }).filter(Boolean).length
+      const totalFields = Object.keys(formFields).length
+
+      trackConversionStep(
+        ConversionGoal.WAITLIST_SIGNUP,
+        FunnelStep.INTENT,
+        `field_${field}`,
+        completedFields,
+        totalFields,
+        { field },
+      )
+    }
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setIsSubmitting(true)
     setFormStatus({})
+
+    // Track form submission attempt
+    trackConversionStep(ConversionGoal.WAITLIST_SIGNUP, FunnelStep.INTENT, "form_submission", 2, 3, {
+      fields_completed: Object.values(formFields).filter(Boolean).length,
+    })
 
     try {
       const formData = new FormData(event.currentTarget)
@@ -45,11 +114,28 @@ export default function WaitlistForm() {
       setFormStatus(result)
 
       if (result.success) {
+        // Track successful conversion
+        trackConversionComplete(ConversionGoal.WAITLIST_SIGNUP, {
+          form: "waitlist",
+          email_domain: formData.get("email")?.toString().split("@")[1] || "unknown",
+        })
+
         // Reset form on success
         event.currentTarget.reset()
         // Get a new token for the next submission
         const newToken = await generateWaitlistFormToken()
         setFormToken(newToken)
+      } else {
+        // Track form error
+        trackEvent(EventName.FORM_ERROR, EventCategory.ERROR, {
+          form: "waitlist",
+          error: result.message,
+          fields_with_errors: JSON.stringify(result.errors),
+        })
+
+        trackConversionAbandon(ConversionGoal.WAITLIST_SIGNUP, FunnelStep.INTENT, "form_error", {
+          error: result.message,
+        })
       }
     } catch (error) {
       console.error("Error submitting form:", error)
@@ -57,12 +143,26 @@ export default function WaitlistForm() {
         success: false,
         message: "An unexpected error occurred. Please try again later.",
       })
+
+      // Track error
+      trackEvent(EventName.FORM_ERROR, EventCategory.ERROR, {
+        form: "waitlist",
+        error: "unexpected_error",
+      })
+
+      trackConversionAbandon(ConversionGoal.WAITLIST_SIGNUP, FunnelStep.INTENT, "unexpected_error")
     } finally {
       setIsSubmitting(false)
     }
   }
 
   const handleShare = () => {
+    // Track share action
+    trackEvent(EventName.LINK_CLICK, EventCategory.ENGAGEMENT, {
+      action: "share",
+      context: "waitlist_success",
+    })
+
     if (navigator.share) {
       navigator
         .share({
@@ -97,18 +197,31 @@ export default function WaitlistForm() {
           placeholder="your.email@example.com"
           required
           disabled={isSubmitting || formStatus.success}
+          onFocus={() => handleFieldFocus("email")}
         />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="name">Name (Optional)</Label>
-        <Input id="name" name="name" placeholder="Your name" disabled={isSubmitting || formStatus.success} />
+        <Input
+          id="name"
+          name="name"
+          placeholder="Your name"
+          disabled={isSubmitting || formStatus.success}
+          onFocus={() => handleFieldFocus("name")}
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="company">Company/Organization (Optional)</Label>
-          <Input id="company" name="company" placeholder="Your company" disabled={isSubmitting || formStatus.success} />
+          <Input
+            id="company"
+            name="company"
+            placeholder="Your company"
+            disabled={isSubmitting || formStatus.success}
+            onFocus={() => handleFieldFocus("company")}
+          />
         </div>
 
         <div className="space-y-2">
@@ -118,6 +231,7 @@ export default function WaitlistForm() {
             name="githubUsername"
             placeholder="Your GitHub username"
             disabled={isSubmitting || formStatus.success}
+            onFocus={() => handleFieldFocus("githubUsername")}
           />
         </div>
       </div>
@@ -129,6 +243,7 @@ export default function WaitlistForm() {
           name="referralSource"
           placeholder="Google, Twitter, Friend, etc."
           disabled={isSubmitting || formStatus.success}
+          onFocus={() => handleFieldFocus("referralSource")}
         />
       </div>
 
@@ -152,7 +267,18 @@ export default function WaitlistForm() {
             <Share2 className="h-4 w-4" />
             Share with Friends
           </Button>
-          <Button type="button" variant="outline" onClick={() => (window.location.href = "/")}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              // Track return to home
+              trackEvent(EventName.LINK_CLICK, EventCategory.NAVIGATION, {
+                action: "return_home",
+                context: "waitlist_success",
+              })
+              window.location.href = "/"
+            }}
+          >
             Return to Home
           </Button>
         </div>

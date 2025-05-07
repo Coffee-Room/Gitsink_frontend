@@ -11,6 +11,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle2 } from "lucide-react"
 import { submitContactForm, generateContactFormToken } from "@/app/actions/contact"
+import {
+  trackConversionStart,
+  trackConversionStep,
+  trackConversionComplete,
+  trackConversionAbandon,
+  ConversionGoal,
+  FunnelStep,
+  EventCategory,
+  EventName,
+  trackEvent,
+} from "@/lib/analytics"
 
 export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -20,6 +31,14 @@ export default function ContactForm() {
     message?: string
     errors?: Record<string, string[]>
   }>({})
+  const [formStarted, setFormStarted] = useState(false)
+  const [formFields, setFormFields] = useState({
+    name: false,
+    email: false,
+    inquiryType: false,
+    subject: false,
+    message: false,
+  })
 
   useEffect(() => {
     // Generate CSRF token when component mounts
@@ -32,12 +51,62 @@ export default function ContactForm() {
       }
     }
     getToken()
-  }, [])
+
+    // Track conversion start when form is viewed
+    trackConversionStart(ConversionGoal.CONTACT_SUBMISSION, FunnelStep.INTENT, {
+      form: "contact",
+      source: document.referrer || "direct",
+    })
+
+    // Track form abandonment
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (!formStatus.success && formStarted) {
+        trackConversionAbandon(ConversionGoal.CONTACT_SUBMISSION, FunnelStep.INTENT, "page_exit", {
+          form: "contact",
+          fields_completed: Object.values(formFields).filter(Boolean).length,
+        })
+      }
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [formStarted, formFields, formStatus.success])
+
+  const handleFieldFocus = (field: keyof typeof formFields) => {
+    if (!formStarted) {
+      setFormStarted(true)
+      trackConversionStep(ConversionGoal.CONTACT_SUBMISSION, FunnelStep.INTENT, "form_started", 1, 3, { field })
+    }
+
+    if (!formFields[field]) {
+      setFormFields((prev) => ({ ...prev, [field]: true }))
+
+      // Count completed fields
+      const completedFields = Object.values({ ...formFields, [field]: true }).filter(Boolean).length
+      const totalFields = Object.keys(formFields).length
+
+      trackConversionStep(
+        ConversionGoal.CONTACT_SUBMISSION,
+        FunnelStep.INTENT,
+        `field_${field}`,
+        completedFields,
+        totalFields,
+        { field },
+      )
+    }
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setIsSubmitting(true)
     setFormStatus({})
+
+    // Track form submission attempt
+    trackConversionStep(ConversionGoal.CONTACT_SUBMISSION, FunnelStep.INTENT, "form_submission", 2, 3, {
+      fields_completed: Object.values(formFields).filter(Boolean).length,
+    })
 
     try {
       const formData = new FormData(event.currentTarget)
@@ -47,11 +116,29 @@ export default function ContactForm() {
       setFormStatus(result)
 
       if (result.success) {
+        // Track successful conversion
+        trackConversionComplete(ConversionGoal.CONTACT_SUBMISSION, {
+          form: "contact",
+          inquiry_type: formData.get("inquiryType")?.toString() || "unknown",
+          email_domain: formData.get("email")?.toString().split("@")[1] || "unknown",
+        })
+
         // Reset form on success
         event.currentTarget.reset()
         // Get a new token for the next submission
         const newToken = await generateContactFormToken()
         setFormToken(newToken)
+      } else {
+        // Track form error
+        trackEvent(EventName.FORM_ERROR, EventCategory.ERROR, {
+          form: "contact",
+          error: result.message,
+          fields_with_errors: JSON.stringify(result.errors),
+        })
+
+        trackConversionAbandon(ConversionGoal.CONTACT_SUBMISSION, FunnelStep.INTENT, "form_error", {
+          error: result.message,
+        })
       }
     } catch (error) {
       console.error("Error submitting form:", error)
@@ -59,6 +146,14 @@ export default function ContactForm() {
         success: false,
         message: "An unexpected error occurred. Please try again later.",
       })
+
+      // Track error
+      trackEvent(EventName.FORM_ERROR, EventCategory.ERROR, {
+        form: "contact",
+        error: "unexpected_error",
+      })
+
+      trackConversionAbandon(ConversionGoal.CONTACT_SUBMISSION, FunnelStep.INTENT, "unexpected_error")
     } finally {
       setIsSubmitting(false)
     }
@@ -75,7 +170,14 @@ export default function ContactForm() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="name">Name</Label>
-          <Input id="name" name="name" placeholder="Your name" required disabled={isSubmitting} />
+          <Input
+            id="name"
+            name="name"
+            placeholder="Your name"
+            required
+            disabled={isSubmitting}
+            onFocus={() => handleFieldFocus("name")}
+          />
         </div>
 
         <div className="space-y-2">
@@ -87,14 +189,20 @@ export default function ContactForm() {
             placeholder="your.email@example.com"
             required
             disabled={isSubmitting}
+            onFocus={() => handleFieldFocus("email")}
           />
         </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="inquiryType">Inquiry Type</Label>
-        <Select name="inquiryType" defaultValue="support" disabled={isSubmitting}>
-          <SelectTrigger id="inquiryType">
+        <Select
+          name="inquiryType"
+          defaultValue="support"
+          disabled={isSubmitting}
+          onValueChange={() => handleFieldFocus("inquiryType")}
+        >
+          <SelectTrigger id="inquiryType" onFocus={() => handleFieldFocus("inquiryType")}>
             <SelectValue placeholder="Select inquiry type" />
           </SelectTrigger>
           <SelectContent>
@@ -109,12 +217,27 @@ export default function ContactForm() {
 
       <div className="space-y-2">
         <Label htmlFor="subject">Subject</Label>
-        <Input id="subject" name="subject" placeholder="Subject of your message" required disabled={isSubmitting} />
+        <Input
+          id="subject"
+          name="subject"
+          placeholder="Subject of your message"
+          required
+          disabled={isSubmitting}
+          onFocus={() => handleFieldFocus("subject")}
+        />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="message">Message</Label>
-        <Textarea id="message" name="message" placeholder="Your message..." rows={6} required disabled={isSubmitting} />
+        <Textarea
+          id="message"
+          name="message"
+          placeholder="Your message..."
+          rows={6}
+          required
+          disabled={isSubmitting}
+          onFocus={() => handleFieldFocus("message")}
+        />
       </div>
 
       {formStatus.message && (

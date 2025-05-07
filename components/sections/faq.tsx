@@ -19,18 +19,14 @@ export default function Faq() {
               <FaqItem
                 value="item-1"
                 question="Do I need to select projects manually?"
-                answer="No, we parse them automatically via Portfolio.md. This file allows you to specify which projects to showcase and add additional metadata."
+                answer="No, Gitsink automatically detects your projects using the Portfolio.md file in each repository. This file lets you specify which projects to showcase and add custom descriptions or metadata. For any project without a Portfolio.md, we use GitHub's publicly available metadata to fill in basic details (name, description, stars, etc.)."
               />
               <FaqItem
                 value="item-2"
                 question="Is Gitsink free?"
                 answer="Yes, for early users on the waitlist. We're committed to providing a generous free tier even after our official launch."
               />
-              <FaqItem
-                value="item-3"
-                question="Can I customize the output?"
-                answer="Custom configs are coming soon. You'll be able to define exactly how your projects are presented and what metadata is included in the API response."
-              />
+              <CustomizationFaqItem />
             </Accordion>
           </div>
         </ScrollReveal>
@@ -50,6 +46,41 @@ function FaqItem({ value, question, answer }: FaqItemProps) {
     <AccordionItem value={value}>
       <AccordionTrigger className="text-left">{question}</AccordionTrigger>
       <AccordionContent>{answer}</AccordionContent>
+    </AccordionItem>
+  )
+}
+
+function CustomizationFaqItem() {
+  return (
+    <AccordionItem value="item-3">
+      <AccordionTrigger className="text-left">Can I customize the output?</AccordionTrigger>
+      <AccordionContent>
+        <p>Absolutely. With Gitsink, you can customize your project showcase in two ways:</p>
+        <ul className="list-disc pl-5 mt-2 space-y-2">
+          <li>
+            <strong>GraphQL API:</strong> Define exactly what data you want to see in your API response by specifying
+            fields in your query. For example:
+            <pre className="bg-muted p-3 rounded-md mt-2 text-xs sm:text-sm font-mono overflow-x-auto">
+              {`query {
+  userProjects(username: "your-username") {
+    name
+    description
+    stars
+    language
+    customField
+  }
+}`}
+            </pre>
+          </li>
+          <li>
+            <strong>Portfolio.md File:</strong> Add custom descriptions, tags, and metadata directly within your GitHub
+            repositories. Gitsink automatically reads this file to enrich your project data.
+          </li>
+        </ul>
+        <p className="mt-2">
+          Advanced customization options (like custom field mappings and layouts) are also coming soon.
+        </p>
+      </AccordionContent>
     </AccordionItem>
   )
 }

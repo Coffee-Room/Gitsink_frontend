@@ -16,9 +16,9 @@ export default function ApiExample() {
 
         <div className="grid gap-6 md:gap-8 lg:grid-cols-2">
           <ScrollReveal animation="slide-right" delay={200}>
-            <div className="rounded-lg bg-zinc-900 p-4 md:p-6 shadow-lg overflow-x-auto">
-              <pre className="text-xs sm:text-sm text-green-400 whitespace-pre-wrap sm:whitespace-pre overflow-visible">
-                <code className="text-green-400 font-mono">
+            <div className="rounded-lg bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-4 md:p-6 shadow-lg dark:shadow-zinc-900/20 overflow-x-auto transition-colors duration-200">
+              <pre className="text-xs sm:text-sm text-gray-800 dark:text-blue-400 whitespace-pre-wrap sm:whitespace-pre overflow-visible">
+                <code className="font-mono text-gray-800 dark:text-blue-400">
                   curl https://api.gitsink.dev/user/projects \ -H "Authorization: Bearer &lt;your-api-key&gt;"
                 </code>
               </pre>
@@ -26,9 +26,9 @@ export default function ApiExample() {
           </ScrollReveal>
 
           <ScrollReveal animation="slide-left" delay={400}>
-            <div className="rounded-lg bg-zinc-900 p-4 md:p-6 shadow-lg overflow-x-auto">
-              <pre className="text-xs sm:text-sm text-blue-400 whitespace-pre-wrap sm:whitespace-pre overflow-visible">
-                <code className="text-blue-400 font-mono">{`{
+            <div className="rounded-lg bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 p-4 md:p-6 shadow-lg dark:shadow-zinc-900/20 overflow-x-auto transition-colors duration-200">
+              <pre className="text-xs sm:text-sm text-gray-800 dark:text-blue-400 whitespace-pre-wrap sm:whitespace-pre overflow-visible">
+                <code className="font-mono text-gray-800 dark:text-blue-400">{`{
   "projects": [
     {
       "name": "awesome-project",

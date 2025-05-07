@@ -4,8 +4,15 @@ import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import ScrollReveal from "@/components/animations/scroll-reveal"
 import Link from "next/link"
+import { trackConversionStep, ConversionGoal, FunnelStep } from "@/lib/analytics"
 
 export default function Cta() {
+  const handleCTAClick = () => {
+    trackConversionStep(ConversionGoal.WAITLIST_SIGNUP, FunnelStep.CONSIDERATION, "cta_click", 2, 3, {
+      location: "homepage_cta",
+    })
+  }
+
   return (
     <section className="py-12 md:py-20">
       <div className="container px-4 md:px-6">
@@ -18,7 +25,7 @@ export default function Cta() {
               Join the waitlist today and be among the first to access Gitsink.
             </p>
             <div className="mt-6 md:mt-8">
-              <Link href="/waitlist">
+              <Link href="/waitlist" onClick={handleCTAClick}>
                 <Button size="lg">
                   Join the Waitlist <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
