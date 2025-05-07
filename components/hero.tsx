@@ -1,5 +1,7 @@
 "use client"
 import { ArrowRight, Github } from "lucide-react"
+import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
 import AnimatedText from "@/components/animated-text"
 import ParallaxElement from "@/components/parallax-element"
@@ -119,9 +121,11 @@ export default function Hero() {
 
           <AnimatedSection delay={isMobile ? 200 : 1200}>
             <div className="mt-8 md:mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-black/90 text-white">
-                Join the Waitlist <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+              <Link href="/waitlist">
+                <Button size="lg" className="w-full sm:w-auto bg-black hover:bg-black/90 text-white">
+                  Join the Waitlist <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
               <Button variant="outline" size="lg" className="w-full sm:w-auto">
                 <Github className="mr-2 h-4 w-4" /> View on GitHub
               </Button>
