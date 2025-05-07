@@ -1,6 +1,8 @@
 import type React from "react"
 import type { Metadata } from "next"
+import { LoadingProvider } from "@/contexts/loading-context"
 import ClientLayout from "./client-layout"
+import "./globals.css"
 
 export const metadata: Metadata = {
   title: "Gitsink - Version Control for Your Data",
@@ -18,8 +20,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return <ClientLayout>{children}</ClientLayout>
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen bg-background font-sans antialiased">
+        <LoadingProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </LoadingProvider>
+      </body>
+    </html>
+  )
 }
-
-
-import './globals.css'

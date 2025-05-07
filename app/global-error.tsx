@@ -1,24 +1,8 @@
 "use client"
 
-import { useEffect } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { AlertTriangle, RefreshCw } from "lucide-react"
-import { Space_Grotesk, DM_Sans } from "next/font/google"
-import { useErrorLogger } from "@/hooks/use-error-logger"
-
-// Space Grotesk for headings - a quirky, modern display font
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-space-grotesk",
-})
-
-// DM Sans for body - slightly quirky but still readable
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-dm-sans",
-})
+import { AlertTriangle, ArrowLeft, RefreshCw } from "lucide-react"
 
 export default function GlobalError({
   error,
@@ -27,41 +11,44 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  const { logError } = useErrorLogger()
-
-  useEffect(() => {
-    // Log the error to an error reporting service
-    logError(error)
-  }, [error, logError])
+  // Simple console logging without hooks
+  console.error("Global error caught:", error.message)
 
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${dmSans.variable}`}>
-      <head>
-        <title>Error - Gitsink</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-      </head>
-      <body className="font-sans bg-background text-foreground">
-        <div className="flex min-h-screen flex-col items-center justify-center p-4">
-          <div className="w-full max-w-md text-center">
-            <div className="mb-8 flex justify-center">
-              <div className="rounded-full bg-destructive/10 p-4">
-                <AlertTriangle className="h-10 w-10 text-destructive" />
+    <html>
+      <body>
+        <div className="flex min-h-screen flex-col">
+          <main className="flex-1 flex items-center justify-center">
+            <div className="container max-w-md px-4 py-16 sm:py-24 md:py-32 text-center">
+              <div className="mb-8 flex justify-center">
+                <div className="rounded-full bg-red-100 p-4">
+                  <AlertTriangle className="h-10 w-10 text-red-600" />
+                </div>
               </div>
-            </div>
-            <h1 className="text-4xl font-heading font-bold tracking-tight sm:text-5xl mb-4">Critical Error</h1>
-            <p className="mb-8 text-muted-foreground">
-              We've encountered a critical error. Our team has been notified and is working to resolve the issue.
-            </p>
-            <Button onClick={reset} className="mx-auto">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Reload Application
-            </Button>
-            {error.digest && (
-              <p className="mt-8 text-xs text-muted-foreground">
-                Error ID: <code className="font-mono">{error.digest}</code>
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl mb-4">500</h1>
+              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl mb-6">Global Error</h2>
+              <p className="mb-8 text-gray-600">
+                We're sorry, but we encountered a critical error. Our team has been notified and is working on a fix.
               </p>
-            )}
-          </div>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button onClick={reset}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Try Again
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href="/">
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Home
+                  </Link>
+                </Button>
+              </div>
+              {error.digest && (
+                <p className="mt-4 text-xs text-gray-500">
+                  Error ID: <code className="font-mono">{error.digest}</code>
+                </p>
+              )}
+            </div>
+          </main>
         </div>
       </body>
     </html>

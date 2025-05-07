@@ -4,6 +4,7 @@ import PoliciesCta from "@/components/policies/cta"
 import PoliciesNavigation from "@/components/policies/policies-navigation"
 import { LanguageProvider } from "@/contexts/language-context"
 import LanguageSelector from "@/components/policies/language-selector"
+import Header from "@/components/layout/header"
 
 export const metadata = {
   title: "Policies | Gitsink",
@@ -12,22 +13,25 @@ export const metadata = {
 
 export default function PoliciesPage() {
   return (
-    <LanguageProvider>
-      <main className="min-h-screen">
-        <PoliciesHero />
-        <section className="py-12 md:py-16">
-          <div className="container px-4 md:px-6">
-            <div className="flex justify-end mb-6">
-              <LanguageSelector />
+    <>
+      <Header />
+      <LanguageProvider>
+        <main className="min-h-screen">
+          <PoliciesHero />
+          <section className="py-12 md:py-16">
+            <div className="container px-4 md:px-6">
+              <div className="flex justify-end mb-6">
+                <LanguageSelector />
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8">
+                <PoliciesNavigation />
+                <PoliciesSections />
+              </div>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-[250px_1fr] gap-8">
-              <PoliciesNavigation />
-              <PoliciesSections />
-            </div>
-          </div>
-        </section>
-        <PoliciesCta />
-      </main>
-    </LanguageProvider>
+          </section>
+          <PoliciesCta />
+        </main>
+      </LanguageProvider>
+    </>
   )
 }

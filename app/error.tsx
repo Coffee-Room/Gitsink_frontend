@@ -1,11 +1,9 @@
 "use client"
 
-import { useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle, ArrowLeft, RefreshCw } from "lucide-react"
-import { useErrorLogger } from "@/hooks/use-error-logger"
 
 export default function Error({
   error,
@@ -14,12 +12,8 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  const { logError } = useErrorLogger()
-
-  useEffect(() => {
-    // Log the error to an error reporting service
-    logError(error)
-  }, [error, logError])
+  // Simple console logging without hooks
+  console.error("Error caught:", error.message)
 
   return (
     <div className="flex min-h-screen flex-col">
