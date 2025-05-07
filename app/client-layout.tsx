@@ -2,7 +2,6 @@
 
 import type React from "react"
 import { ThemeProvider } from "@/components/theme-provider"
-import Footer from "@/components/layout/footer"
 import { CookieConsent } from "@/components/cookie-consent"
 import { Toaster } from "@/components/ui/toaster"
 import { Space_Grotesk, DM_Sans } from "next/font/google"
@@ -23,7 +22,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       <div className={`${spaceGrotesk.variable} ${dmSans.variable}`}>
         {children}
-        <Footer />
         <CookieConsent />
         <Toaster />
       </div>

@@ -1,8 +1,5 @@
 import Header from "@/components/layout/header"
-import Footer from "@/components/layout/footer"
 import Hero from "@/components/sections/hero"
-
-// Import sections directly instead of using dynamic imports
 import HowItWorks from "@/components/sections/how-it-works"
 import Features from "@/components/sections/features"
 import ApiExample from "@/components/sections/api-example"
@@ -25,7 +22,6 @@ export default function Home() {
         <Faq />
         <Cta />
       </main>
-      <Footer />
     </div>
   )
 }

@@ -1,81 +1,82 @@
 "use client"
 
-import { useEffect, useState, useRef, type ReactNode } from "react"
-import { useLoading } from "@/contexts/loading-context"
+import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useInView } from "@/hooks/use-in-view"
+import { useReducedMotion } from "@/hooks/use-reduced-motion"
+import { useIsMobile } from "@/hooks/use-is-mobile"
 
 interface CoordinatedAnimationProps {
   children: ReactNode
   delay?: number
-  duration?: number
+  type: "fade" | "slide-up" | "slide-down" | "slide-left" | "slide-right" | "zoom"
   className?: string
-  disabled?: boolean
-  type?: "fade" | "slide-up" | "slide-down" | "slide-left" | "slide-right" | "zoom"
-  waitForHydration?: boolean
+  threshold?: number
+  once?: boolean
 }
 
 export function CoordinatedAnimation({
   children,
   delay = 0,
-  duration = 600,
-  className = "",
-  disabled = false,
   type = "fade",
-  waitForHydration = true,
+  className = "",
+  threshold = 0.1,
+  once = true,
 }: CoordinatedAnimationProps) {
-  const { isHydrated } = useLoading()
-  const [isVisible, setIsVisible] = useState(!waitForHydration)
-  const animationStarted = useRef(false)
+  const [isVisible, setIsVisible] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { threshold, once })
+  const prefersReducedMotion = useReducedMotion()
+  const isMobile = useIsMobile()
+  const hasAnimated = useRef(false)
+
+  // Simplify animations on mobile
+  const mobileOptimizedDelay = isMobile ? Math.min(delay, 200) : delay
 
   useEffect(() => {
-    if (disabled || animationStarted.current) {
+    if (prefersReducedMotion) {
+      setIsVisible(true)
       return
     }
 
-    if (waitForHydration && !isHydrated) return
+    if (inView && !hasAnimated.current) {
+      const timer = setTimeout(() => {
+        setIsVisible(true)
+        hasAnimated.current = true
+      }, mobileOptimizedDelay)
 
-    const timer = setTimeout(() => {
-      setIsVisible(true)
-      animationStarted.current = true
-    }, delay)
-
-    return () => clearTimeout(timer)
-  }, [delay, disabled, isHydrated, waitForHydration])
-
-  // Define initial and animated styles based on animation type
-  const getStyles = () => {
-    if (disabled || (!waitForHydration && !isHydrated)) {
-      return {}
+      return () => clearTimeout(timer)
     }
+  }, [inView, mobileOptimizedDelay, prefersReducedMotion])
 
-    const baseStyles = {
-      opacity: isVisible ? 1 : 0,
-      transform: isVisible ? "none" : "",
-      transition: `opacity ${duration}ms ease-out, transform ${duration}ms ease-out`,
-    }
+  // If user prefers reduced motion, skip animations
+  if (prefersReducedMotion) {
+    return <div className={className}>{children}</div>
+  }
 
+  const getAnimationStyles = () => {
     if (!isVisible) {
       switch (type) {
-        case "slide-up":
-          return { ...baseStyles, transform: "translateY(20px)" }
-        case "slide-down":
-          return { ...baseStyles, transform: "translateY(-20px)" }
-        case "slide-left":
-          return { ...baseStyles, transform: "translateX(20px)" }
-        case "slide-right":
-          return { ...baseStyles, transform: "translateX(-20px)" }
-        case "zoom":
-          return { ...baseStyles, transform: "scale(0.95)" }
         case "fade":
+          return "opacity-0"
+        case "slide-up":
+          return "opacity-0 translate-y-8"
+        case "slide-down":
+          return "opacity-0 -translate-y-8"
+        case "slide-left":
+          return "opacity-0 translate-x-8"
+        case "slide-right":
+          return "opacity-0 -translate-x-8"
+        case "zoom":
+          return "opacity-0 scale-95"
         default:
-          return baseStyles
+          return "opacity-0"
       }
     }
-
-    return baseStyles
+    return "opacity-100 translate-x-0 translate-y-0 scale-100"
   }
 
   return (
-    <div className={className} style={getStyles()}>
+    <div ref={ref} className={`transition-all duration-700 ease-out ${getAnimationStyles()} ${className}`}>
       {children}
     </div>
   )
