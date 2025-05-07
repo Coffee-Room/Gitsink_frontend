@@ -7,7 +7,6 @@ import ContactInfo from "@/components/contact/contact-info"
 export default function ContactPage() {
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
       <main className="flex-1 relative">
         <ContactHero />
         <div className="container px-4 md:px-6 py-12 md:py-16 lg:py-20">

@@ -12,7 +12,6 @@ export const metadata: Metadata = {
 export default function WaitlistPage() {
   return (
     <>
-      <Header />
       <main className="flex flex-col min-h-screen">
         <WaitlistHero />
         <section className="py-12 md:py-16 bg-muted/50">

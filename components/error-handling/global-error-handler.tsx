@@ -1,11 +1,13 @@
 "use client"
 
-import type React from "react"
-
-import { useEffect } from "react"
+import { useEffect, type ReactNode } from "react"
 import { useErrorLogger } from "@/hooks/use-error-logger"
 
-export function GlobalErrorHandler({ children }: { children?: React.ReactNode }) {
+interface GlobalErrorHandlerProps {
+  children: ReactNode
+}
+
+export function GlobalErrorHandler({ children }: GlobalErrorHandlerProps) {
   const { logError } = useErrorLogger()
 
   useEffect(() => {
@@ -16,8 +18,8 @@ export function GlobalErrorHandler({ children }: { children?: React.ReactNode })
       // Log the error
       if (error) {
         logError(error)
-      } else {
-        logError(new Error(message as string))
+      } else if (typeof message === "string") {
+        logError(new Error(message))
       }
 
       // Call the original handler if it exists
@@ -33,7 +35,7 @@ export function GlobalErrorHandler({ children }: { children?: React.ReactNode })
     const originalOnUnhandledRejection = window.onunhandledrejection
 
     window.onunhandledrejection = (event) => {
-      // Log the error
+      // Log the rejection reason
       if (event.reason instanceof Error) {
         logError(event.reason)
       } else {
@@ -46,8 +48,8 @@ export function GlobalErrorHandler({ children }: { children?: React.ReactNode })
       }
     }
 
-    // Clean up
     return () => {
+      // Restore original handlers on cleanup
       window.onerror = originalOnError
       window.onunhandledrejection = originalOnUnhandledRejection
     }

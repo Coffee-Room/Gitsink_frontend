@@ -1494,7 +1494,7 @@ export const policyTranslations = {
           ],
         },
         {
-          title: "2. データ処理",
+          title: "2. ��ータ処理",
           content:
             "当社はプライバシーポリシーで指定された目的のためにのみデータを処理します。データ処理活動には以下が含まれます：",
           list: [

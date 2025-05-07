@@ -11,7 +11,6 @@ import ScrollToTopButton from "@/components/ui/scroll-to-top-button"
 export default function FeaturesPage() {
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
       <main className="flex-1 relative">
         <FeaturesHero />
         <ProblemSolution />

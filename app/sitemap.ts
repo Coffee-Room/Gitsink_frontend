@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next"
+import { getAbsoluteUrl } from "@/lib/url-utils"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://gitsink.com"
-
   const routes = [
     "",
     "/features",
@@ -14,7 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/status",
     "/sitemap",
   ].map((route) => ({
-    url: `${baseUrl}${route}`,
+    url: getAbsoluteUrl(route),
     lastModified: new Date(),
     changeFrequency: "weekly" as const,
     priority: route === "" ? 1 : 0.8,

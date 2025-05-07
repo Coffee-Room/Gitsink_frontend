@@ -14,7 +14,6 @@ export const metadata = {
 export default function PoliciesPage() {
   return (
     <>
-      <Header />
       <LanguageProvider>
         <main className="min-h-screen">
           <PoliciesHero />

@@ -26,7 +26,6 @@ export default function HowItWorksPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <Header />
       <main className="flex-1 relative">
         {isLoading ? (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-50">

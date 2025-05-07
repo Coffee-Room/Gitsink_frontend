@@ -1,34 +1,37 @@
 "use client"
 
 import type React from "react"
-import { ThemeProvider } from "@/components/theme-provider"
-import Footer from "@/components/layout/footer"
+
+import { useEffect } from "react"
+import { LoadingProvider } from "@/contexts/loading-context"
+import { Header } from "@/components/layout/header"
+import { Footer } from "@/components/layout/footer"
 import { CookieConsent } from "@/components/cookie-consent"
-import { Toaster } from "@/components/ui/toaster"
-import { Space_Grotesk, DM_Sans } from "next/font/google"
 import { ScrollToTopOnNavigation } from "@/components/scroll-to-top-on-navigation"
-
-// Define fonts
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-space-grotesk",
-})
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-})
+import { GlobalErrorHandler } from "@/components/error-handling/global-error-handler"
+import { AnalyticsProvider } from "@/components/analytics/analytics-provider"
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
+  // Log environment variables for debugging (without exposing sensitive data)
+  useEffect(() => {
+    console.log("Environment:", {
+      nodeEnv: process.env.NODE_ENV,
+      hasBaseUrl: !!process.env.NEXT_PUBLIC_BASE_URL,
+      hasSiteUrl: !!process.env.NEXT_PUBLIC_SITE_URL,
+    })
+  }, [])
+
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <div className={`${spaceGrotesk.variable} ${dmSans.variable}`}>
-        <ScrollToTopOnNavigation />
-        {children}
-        <Footer />
-        <CookieConsent />
-        <Toaster />
-      </div>
-    </ThemeProvider>
+    <LoadingProvider>
+      <GlobalErrorHandler>
+        <AnalyticsProvider>
+          <ScrollToTopOnNavigation />
+          <Header />
+          <main className="min-h-screen">{children}</main>
+          <Footer />
+          <CookieConsent />
+        </AnalyticsProvider>
+      </GlobalErrorHandler>
+    </LoadingProvider>
   )
 }
