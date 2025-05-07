@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Github } from "lucide-react"
 
-export default function SiteFooter() {
+export default function Footer() {
   return (
     <footer className="border-t py-8 md:py-12">
       <div className="container px-4 md:px-6">

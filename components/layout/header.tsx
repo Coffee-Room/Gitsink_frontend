@@ -47,22 +47,10 @@ export default function Header() {
             FAQ
           </Link>
           <Link
-            href="/contact"
-            className="text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all hover:after:w-full"
-          >
-            Contact
-          </Link>
-          <Link
             href="/status"
             className="text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all hover:after:w-full"
           >
             Status
-          </Link>
-          <Link
-            href="/policies"
-            className="text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all hover:after:w-full"
-          >
-            Policies
           </Link>
         </nav>
 
