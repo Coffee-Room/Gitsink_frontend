@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "Gitsink - Version Control for Your Data",
   description:
     "Gitsink provides Git-like version control for your data, making it easy to track changes, collaborate, and roll back when needed.",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
     generator: 'v0.dev'
 }
 
