@@ -1,30 +1,30 @@
 # Gitsink Landing Page
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+## Error Handling
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/wavethedevs-projects/v0-gitsink-landing-page)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/qLFS5OBxAvS)
+This project includes custom error pages for different error scenarios:
 
-## Overview
+### 404 Not Found
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+The 404 page is displayed when a user navigates to a route that doesn't exist. It's defined in `app/not-found.tsx`.
 
-## Deployment
+You can also programmatically trigger a 404 page using the `handleNotFound` utility:
 
-Your project is live at:
+\`\`\`typescript
+import { handleNotFound } from "@/lib/not-found"
 
-**[https://vercel.com/wavethedevs-projects/v0-gitsink-landing-page](https://vercel.com/wavethedevs-projects/v0-gitsink-landing-page)**
+// In a page or component:
+handleNotFound(!project, "Project not found")
+\`\`\`
 
-## Build your app
+### 500 Server Error
 
-Continue building your app on:
+The 500 error page is displayed when an error occurs in a page or component. It's defined in `app/error.tsx`.
 
-**[https://v0.dev/chat/projects/qLFS5OBxAvS](https://v0.dev/chat/projects/qLFS5OBxAvS)**
+### Global Error
 
-## How It Works
+The global error page is displayed when an error occurs in the root layout. It's defined in `app/global-error.tsx`.
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+### Component-Level Error Boundaries
+
+The application also uses component-level error boundaries to isolate errors to specific sections of the page. These are defined in `components/error-handling/error-boundary.tsx`.

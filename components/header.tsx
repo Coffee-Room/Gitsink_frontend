@@ -5,21 +5,25 @@ import MobileMenu from "@/components/mobile-menu"
 
 export default function Header() {
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center justify-between py-3">
-        <div className="flex items-center">
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/images/gitsink-logo-wordmark.png"
-              alt="Gitsink Logo"
-              width={220}
-              height={55}
-              className="h-12 sm:h-14 w-auto"
-              priority
-            />
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 md:h-20 items-center justify-between px-4 md:px-6">
+        <div className="flex justify-start">
+          <Link href="/" className="inline-flex items-center">
+            <div className="flex items-center">
+              <Image
+                src="/images/gitsink-icon.svg"
+                alt="Gitsink Logo"
+                width={40}
+                height={40}
+                className="h-8 md:h-10 w-auto"
+                priority
+              />
+              <span className="ml-2 text-xl md:text-2xl font-heading font-bold tracking-tight logo-text">Gitsink</span>
+            </div>
           </Link>
         </div>
-        <nav className="hidden md:flex gap-6">
+
+        <nav className="hidden md:flex items-center space-x-6">
           <Link
             href="#how-it-works"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -45,7 +49,8 @@ export default function Header() {
             FAQ
           </Link>
         </nav>
-        <div className="flex items-center gap-2">
+
+        <div className="flex justify-end">
           <Button className="hidden md:inline-flex bg-black hover:bg-black/90 text-white">Join Waitlist</Button>
           <MobileMenu />
         </div>

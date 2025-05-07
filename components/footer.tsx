@@ -9,13 +9,8 @@ export default function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 md:flex-row md:gap-6">
           <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center">
-              <Image
-                src="/images/gitsink-logo-wordmark.png"
-                alt="Gitsink Logo"
-                width={120}
-                height={35}
-                className="h-8 w-auto"
-              />
+              <Image src="/images/gitsink-icon.svg" alt="Gitsink Logo" width={32} height={32} className="h-7 w-auto" />
+              <span className="ml-2 text-lg font-heading font-bold tracking-tight logo-text">Gitsink</span>
             </Link>
           </div>
           <p className="text-center text-sm text-muted-foreground md:text-left">Made by developers for developers.</p>

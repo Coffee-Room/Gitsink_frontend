@@ -22,17 +22,12 @@ export default function MobileMenu() {
           <span className="sr-only">Toggle menu</span>
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+      <SheetContent side="right" className="w-[280px] sm:w-[320px]">
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between border-b pb-4">
             <div className="flex items-center">
-              <Image
-                src="/images/gitsink-logo-wordmark.png"
-                alt="Gitsink Logo"
-                width={140}
-                height={40}
-                className="h-8 w-auto"
-              />
+              <Image src="/images/gitsink-icon.svg" alt="Gitsink Logo" width={32} height={32} className="h-8 w-auto" />
+              <span className="ml-2 text-xl font-heading font-bold tracking-tight logo-text">Gitsink</span>
             </div>
             <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
               <X className="h-5 w-5" />
