@@ -28,7 +28,7 @@ export default function StatusHeader({ lastUpdated }: StatusHeaderProps) {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center">
             <Link href="/" className="mr-6 flex items-center">
-              <Image src="/images/gitsink-icon.svg" alt="Gitsink Logo" width={32} height={32} className="h-8 w-auto" />
+              <Image src="/images/gitsink-logo-icon.png" alt="Gitsink Logo" width={32} height={32} className="h-8 w-auto" />
               <span className="ml-2 text-xl font-heading font-bold tracking-tight logo-text">Gitsink</span>
             </Link>
             <h1 className="text-xl font-heading font-bold">Status</h1>

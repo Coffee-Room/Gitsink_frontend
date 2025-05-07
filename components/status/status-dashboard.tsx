@@ -1,148 +1,113 @@
 "use client"
 
-import { Suspense, lazy } from "react"
+import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Clock } from "lucide-react"
-import StatusIndicator from "@/components/status/status-indicator"
-import {
-  UptimeGraphSkeleton,
-  IncidentHistorySkeleton,
-  MaintenanceScheduleSkeleton,
-} from "@/components/status/status-skeleton"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertTriangle, CheckCircle2, Clock } from "lucide-react"
+import { ErrorBoundary } from "react-error-boundary"
+import type { MaintenanceDetails } from "@/lib/maintenance"
 import type { SystemStatus } from "@/types/status"
+import StatusIndicator from "@/components/status/status-indicator"
+import UptimeGraph from "@/components/status/uptime-graph"
+import IncidentHistory from "@/components/status/incident-history"
+import MaintenanceSchedule from "@/components/status/maintenance-schedule"
 
-// Lazy load tab content components
-const UptimeGraph = lazy(() => import("@/components/status/uptime-graph"))
-const IncidentHistory = lazy(() => import("@/components/status/incident-history"))
-const MaintenanceSchedule = lazy(() => import("@/components/status/maintenance-schedule"))
+// Simple fallback component for errors
+function ErrorFallback({ error }: { error: Error }) {
+  return (
+    <Card className="mb-6">
+      <CardContent className="pt-6">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>Failed to load this component: {error.message}</AlertDescription>
+        </Alert>
+      </CardContent>
+    </Card>
+  )
+}
 
 interface StatusDashboardProps {
-  maintenance: {
-    isActive: boolean
-    endTime: string | null
-    reason: string | null
-  }
+  maintenance: MaintenanceDetails
   status: SystemStatus
 }
 
 export default function StatusDashboard({ maintenance, status }: StatusDashboardProps) {
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "operational":
-        return "Operational"
-      case "degraded":
-        return "Degraded Performance"
-      case "partial_outage":
-        return "Partial Outage"
-      case "major_outage":
-        return "Major Outage"
-      case "maintenance":
-        return "Under Maintenance"
-      default:
-        return "Unknown"
-    }
-  }
+  const [activeTab, setActiveTab] = useState("overview")
 
-  const getOverallStatus = () => {
-    if (maintenance.isActive) {
-      return "maintenance"
-    }
-
-    if (status.services.some((service) => service.status === "major_outage")) {
-      return "major_outage"
-    }
-
-    if (status.services.some((service) => service.status === "partial_outage")) {
-      return "partial_outage"
-    }
-
-    if (status.services.some((service) => service.status === "degraded")) {
-      return "degraded"
-    }
-
-    return "operational"
-  }
-
-  const overallStatus = getOverallStatus()
+  const allOperational = status.services.every((service) => service.status === "operational")
 
   return (
-    <>
-      {/* Current Status Overview */}
-      <Card className="mb-8">
-        <CardHeader className="pb-3">
+    <div className="space-y-8">
+      <Card>
+        <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <CardTitle className="text-2xl">System Status</CardTitle>
-              <CardDescription>Current operational status of Gitsink services</CardDescription>
+              <CardDescription>Current status of Gitsink services</CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <StatusIndicator status={overallStatus} size="lg" />
-              <span className="font-medium">{getStatusLabel(overallStatus)}</span>
+              {allOperational ? (
+                <>
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  <span className="font-medium text-green-500">All Systems Operational</span>
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="h-5 w-5 text-amber-500" />
+                  <span className="font-medium text-amber-500">Service Disruption</span>
+                </>
+              )}
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          {maintenance.isActive && (
-            <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg">
-              <div className="flex items-start">
-                <Clock className="h-5 w-5 text-amber-600 dark:text-amber-400 mr-3 mt-0.5" />
-                <div>
-                  <h3 className="font-medium text-amber-800 dark:text-amber-300">Scheduled Maintenance in Progress</h3>
-                  <p className="mt-1 text-sm text-amber-700 dark:text-amber-400">{maintenance.reason}</p>
-                  {maintenance.endTime && (
-                    <p className="mt-2 text-sm font-medium text-amber-700 dark:text-amber-400">
-                      Expected completion: {maintenance.endTime}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+          <div className="space-y-6">
+            {maintenance.isActive && (
+              <Alert className="bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900">
+                <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                <AlertTitle className="text-amber-800 dark:text-amber-300">Scheduled Maintenance</AlertTitle>
+                <AlertDescription className="text-amber-700 dark:text-amber-400">
+                  {maintenance.reason || "Scheduled maintenance is currently in progress."}
+                  {maintenance.endTime && <> Expected to end by {new Date(maintenance.endTime).toLocaleString()}.</>}
+                </AlertDescription>
+              </Alert>
+            )}
 
-          <div className="space-y-4">
-            {status.services.map((service) => (
-              <div key={service.id} className="flex items-center justify-between py-2 border-b last:border-0">
-                <div>
-                  <h3 className="font-medium">{service.name}</h3>
-                  <p className="text-sm text-muted-foreground">{service.description}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <StatusIndicator status={service.status} />
-                  <span className="text-sm">{getStatusLabel(service.status)}</span>
-                </div>
-              </div>
-            ))}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {status.services.map((service) => (
+                <ErrorBoundary key={service.id} FallbackComponent={ErrorFallback}>
+                  <StatusIndicator service={service} />
+                </ErrorBoundary>
+              ))}
+            </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Tabs for different views */}
-      <Tabs defaultValue="uptime">
-        <TabsList className="mb-6">
-          <TabsTrigger value="uptime">Uptime</TabsTrigger>
-          <TabsTrigger value="incidents">Incident History</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="incidents">Incidents</TabsTrigger>
           <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="uptime">
-          <Suspense fallback={<UptimeGraphSkeleton />}>
+        <TabsContent value="overview" className="mt-6">
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
             <UptimeGraph data={status.uptimeData} />
-          </Suspense>
+          </ErrorBoundary>
         </TabsContent>
-
-        <TabsContent value="incidents">
-          <Suspense fallback={<IncidentHistorySkeleton />}>
+        <TabsContent value="incidents" className="mt-6">
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
             <IncidentHistory incidents={status.incidents} />
-          </Suspense>
+          </ErrorBoundary>
         </TabsContent>
-
-        <TabsContent value="maintenance">
-          <Suspense fallback={<MaintenanceScheduleSkeleton />}>
-            <MaintenanceSchedule events={status.maintenanceEvents} />
-          </Suspense>
+        <TabsContent value="maintenance" className="mt-6">
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <MaintenanceSchedule schedules={status.maintenanceSchedules} />
+          </ErrorBoundary>
         </TabsContent>
       </Tabs>
-    </>
+    </div>
   )
 }

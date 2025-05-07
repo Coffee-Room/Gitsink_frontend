@@ -1,8 +1,15 @@
-export interface ServiceStatus {
+export type ServiceStatus = "operational" | "degraded" | "partial_outage" | "major_outage" | "maintenance" | "unknown"
+
+export interface Service {
   id: string
   name: string
   description: string
-  status: "operational" | "degraded" | "partial_outage" | "major_outage" | "maintenance"
+  status: ServiceStatus
+}
+
+export interface UptimeData {
+  date: string
+  uptime: number
 }
 
 export interface IncidentUpdate {
@@ -14,11 +21,11 @@ export interface IncidentUpdate {
 export interface Incident {
   id: string
   title: string
-  severity: "critical" | "major" | "minor" | "warning" | "info"
-  status: "investigating" | "identified" | "monitoring" | "resolved"
+  status: string
+  severity: string
   createdAt: string
   updatedAt: string
-  resolvedAt: string | null
+  resolvedAt?: string
   affectedServices: string[]
   updates: IncidentUpdate[]
 }
@@ -27,24 +34,23 @@ export interface MaintenanceEvent {
   id: string
   title: string
   description: string
-  status: "scheduled" | "in_progress" | "completed" | "cancelled"
+  status: string
   startTime: string
   endTime: string
-  affectedServices: string[]
-}
-
-export interface UptimeData {
-  last24Hours: { serviceId: string; serviceName: string; uptime: number }[]
-  last7Days: { serviceId: string; serviceName: string; uptime: number }[]
-  last30Days: { serviceId: string; serviceName: string; uptime: number }[]
-  last90Days: { serviceId: string; serviceName: string; uptime: number }[]
+  affectedServices?: string[]
 }
 
 export interface SystemStatus {
-  status: "operational" | "degraded" | "partial_outage" | "major_outage" | "maintenance"
+  status: ServiceStatus
   lastUpdated: string
-  services: ServiceStatus[]
+  services: Service[]
   incidents: Incident[]
-  maintenanceEvents: MaintenanceEvent[]
-  uptimeData: UptimeData
+  uptimeData: UptimeData[]
+  maintenanceSchedules: MaintenanceEvent[]
+}
+
+export interface MaintenanceDetails {
+  isActive: boolean
+  endTime: string | null
+  reason: string | null
 }

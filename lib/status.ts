@@ -1,157 +1,175 @@
-import type { SystemStatus } from "@/types/status"
-import { getMaintenanceDetails } from "@/lib/maintenance"
+import type { SystemStatus, Service, Incident, MaintenanceEvent, UptimeData } from "@/types/status"
 
-// In a real application, this would fetch data from a database or API
+// Mock data for the system status
 export async function getSystemStatus(): Promise<SystemStatus> {
-  const maintenance = getMaintenanceDetails()
-
-  // Mock data for demonstration
+  // In a real application, this would fetch data from an API
   return {
-    status: maintenance.isActive ? "maintenance" : "operational",
+    status: "operational",
     lastUpdated: new Date().toISOString(),
-    services: [
-      {
-        id: "api",
-        name: "API",
-        description: "Core API services",
-        status: maintenance.isActive ? "maintenance" : "operational",
-      },
-      {
-        id: "web",
-        name: "Web Application",
-        description: "User-facing web interface",
-        status: maintenance.isActive ? "maintenance" : "operational",
-      },
-      {
-        id: "db",
-        name: "Database",
-        description: "Data storage and retrieval",
-        status: maintenance.isActive ? "maintenance" : "operational",
-      },
-      {
-        id: "auth",
-        name: "Authentication",
-        description: "User authentication and authorization",
-        status: maintenance.isActive ? "maintenance" : "operational",
-      },
-      {
-        id: "github",
-        name: "GitHub Integration",
-        description: "GitHub API integration and webhooks",
-        status: maintenance.isActive ? "maintenance" : "operational",
-      },
-    ],
-    incidents: [
-      {
-        id: "incident-1",
-        title: "API Performance Degradation",
-        severity: "minor",
-        status: "resolved",
-        createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
-        updatedAt: new Date(Date.now() - 6.5 * 24 * 60 * 60 * 1000).toISOString(),
-        resolvedAt: new Date(Date.now() - 6.5 * 24 * 60 * 60 * 1000).toISOString(),
-        affectedServices: ["API"],
-        updates: [
-          {
-            timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-            status: "investigating",
-            message: "We are investigating reports of slow API response times.",
-          },
-          {
-            timestamp: new Date(Date.now() - 6.8 * 24 * 60 * 60 * 1000).toISOString(),
-            status: "identified",
-            message: "The issue has been identified as a database query optimization problem.",
-          },
-          {
-            timestamp: new Date(Date.now() - 6.5 * 24 * 60 * 60 * 1000).toISOString(),
-            status: "resolved",
-            message: "The issue has been resolved by optimizing database queries. We are monitoring the situation.",
-          },
-        ],
-      },
-      {
-        id: "incident-2",
-        title: "GitHub Integration Outage",
-        severity: "major",
-        status: "resolved",
-        createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days ago
-        updatedAt: new Date(Date.now() - 13.5 * 24 * 60 * 60 * 1000).toISOString(),
-        resolvedAt: new Date(Date.now() - 13.5 * 24 * 60 * 60 * 1000).toISOString(),
-        affectedServices: ["GitHub Integration"],
-        updates: [
-          {
-            timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
-            status: "investigating",
-            message: "We are investigating an issue with GitHub integration.",
-          },
-          {
-            timestamp: new Date(Date.now() - 13.8 * 24 * 60 * 60 * 1000).toISOString(),
-            status: "identified",
-            message: "The issue has been identified as a rate limiting problem with the GitHub API.",
-          },
-          {
-            timestamp: new Date(Date.now() - 13.5 * 24 * 60 * 60 * 1000).toISOString(),
-            status: "resolved",
-            message: "The issue has been resolved by implementing better rate limiting handling.",
-          },
-        ],
-      },
-    ],
-    maintenanceEvents: [
-      {
-        id: "maintenance-1",
-        title: "Database Upgrade",
-        description: "Scheduled maintenance to upgrade our database systems for improved performance.",
-        status: "completed",
-        startTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
-        endTime: new Date(Date.now() - 2.9 * 24 * 60 * 60 * 1000).toISOString(),
-        affectedServices: ["Database", "API"],
-      },
-      {
-        id: "maintenance-2",
-        title: "Infrastructure Updates",
-        description: "Scheduled maintenance to update our infrastructure and improve reliability.",
-        status: maintenance.isActive ? "in_progress" : "scheduled",
-        startTime: maintenance.isActive
-          ? new Date().toISOString()
-          : new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days from now
-        endTime: maintenance.isActive
-          ? maintenance.endTime
-            ? new Date(maintenance.endTime).toISOString()
-            : new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString()
-          : new Date(Date.now() + 2.1 * 24 * 60 * 60 * 1000).toISOString(),
-        affectedServices: ["API", "Web Application", "Authentication", "Database", "GitHub Integration"],
-      },
-    ],
-    uptimeData: {
-      last24Hours: [
-        { serviceId: "api", serviceName: "API", uptime: 1.0 },
-        { serviceId: "web", serviceName: "Web Application", uptime: 1.0 },
-        { serviceId: "db", serviceName: "Database", uptime: 1.0 },
-        { serviceId: "auth", serviceName: "Authentication", uptime: 1.0 },
-        { serviceId: "github", serviceName: "GitHub Integration", uptime: 1.0 },
-      ],
-      last7Days: [
-        { serviceId: "api", serviceName: "API", uptime: 0.995 },
-        { serviceId: "web", serviceName: "Web Application", uptime: 0.999 },
-        { serviceId: "db", serviceName: "Database", uptime: 0.998 },
-        { serviceId: "auth", serviceName: "Authentication", uptime: 1.0 },
-        { serviceId: "github", serviceName: "GitHub Integration", uptime: 0.997 },
-      ],
-      last30Days: [
-        { serviceId: "api", serviceName: "API", uptime: 0.992 },
-        { serviceId: "web", serviceName: "Web Application", uptime: 0.998 },
-        { serviceId: "db", serviceName: "Database", uptime: 0.995 },
-        { serviceId: "auth", serviceName: "Authentication", uptime: 0.999 },
-        { serviceId: "github", serviceName: "GitHub Integration", uptime: 0.994 },
-      ],
-      last90Days: [
-        { serviceId: "api", serviceName: "API", uptime: 0.99 },
-        { serviceId: "web", serviceName: "Web Application", uptime: 0.997 },
-        { serviceId: "db", serviceName: "Database", uptime: 0.993 },
-        { serviceId: "auth", serviceName: "Authentication", uptime: 0.998 },
-        { serviceId: "github", serviceName: "GitHub Integration", uptime: 0.991 },
+    services: getMockServices(),
+    incidents: getMockIncidents(),
+    uptimeData: getMockUptimeData(),
+    maintenanceSchedules: getMockMaintenanceEvents(),
+  }
+}
+
+function getMockServices(): Service[] {
+  return [
+    {
+      id: "api",
+      name: "API",
+      description: "Core API services",
+      status: "operational",
+    },
+    {
+      id: "dashboard",
+      name: "Dashboard",
+      description: "User dashboard and analytics",
+      status: "operational",
+    },
+    {
+      id: "webhooks",
+      name: "Webhooks",
+      description: "Event notifications",
+      status: "operational",
+    },
+    {
+      id: "storage",
+      name: "Storage",
+      description: "File storage and CDN",
+      status: "operational",
+    },
+    {
+      id: "auth",
+      name: "Authentication",
+      description: "User authentication services",
+      status: "operational",
+    },
+    {
+      id: "billing",
+      name: "Billing",
+      description: "Payment processing",
+      status: "operational",
+    },
+  ]
+}
+
+function getMockIncidents(): Incident[] {
+  return [
+    {
+      id: "inc-1",
+      title: "API Performance Degradation",
+      status: "resolved",
+      severity: "minor",
+      createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+      resolvedAt: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+      affectedServices: ["API", "Webhooks"],
+      updates: [
+        {
+          timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+          status: "investigating",
+          message: "We are investigating reports of API slowdowns.",
+        },
+        {
+          timestamp: new Date(Date.now() - 6.5 * 24 * 60 * 60 * 1000).toISOString(),
+          status: "identified",
+          message: "We have identified the issue with our database cluster and are working on a fix.",
+        },
+        {
+          timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
+          status: "resolved",
+          message: "The issue has been resolved and API performance has returned to normal.",
+        },
       ],
     },
+    {
+      id: "inc-2",
+      title: "Dashboard Access Issues",
+      status: "resolved",
+      severity: "major",
+      createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 13 * 24 * 60 * 60 * 1000).toISOString(),
+      resolvedAt: new Date(Date.now() - 13 * 24 * 60 * 60 * 1000).toISOString(),
+      affectedServices: ["Dashboard", "Authentication"],
+      updates: [
+        {
+          timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString(),
+          status: "investigating",
+          message: "We are investigating reports of users unable to access the dashboard.",
+        },
+        {
+          timestamp: new Date(Date.now() - 13.5 * 24 * 60 * 60 * 1000).toISOString(),
+          status: "identified",
+          message: "We have identified an issue with our authentication service and are implementing a fix.",
+        },
+        {
+          timestamp: new Date(Date.now() - 13 * 24 * 60 * 60 * 1000).toISOString(),
+          status: "resolved",
+          message: "The authentication service has been restored and dashboard access is now working normally.",
+        },
+      ],
+    },
+  ]
+}
+
+function getMockUptimeData(): UptimeData[] {
+  const data: UptimeData[] = []
+  const now = new Date()
+
+  // Generate 90 days of uptime data
+  for (let i = 90; i >= 0; i--) {
+    const date = new Date(now)
+    date.setDate(now.getDate() - i)
+
+    // Generate a random uptime percentage between 99 and 100 for most days
+    // with a few days having lower values to simulate incidents
+    let uptime = 99.9 + Math.random() * 0.1
+
+    // Simulate a few days with incidents
+    if (i === 7 || i === 14 || i === 30) {
+      uptime = 95 + Math.random() * 4
+    }
+
+    data.push({
+      date: date.toISOString().split("T")[0],
+      uptime: Number.parseFloat(uptime.toFixed(2)),
+    })
   }
+
+  return data
+}
+
+function getMockMaintenanceEvents(): MaintenanceEvent[] {
+  const now = new Date()
+
+  return [
+    {
+      id: "maint-1",
+      title: "Database Optimization",
+      description: "Scheduled maintenance to optimize database performance. Brief API interruptions may occur.",
+      status: "completed",
+      startTime: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+      endTime: new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000).toISOString(),
+      affectedServices: ["API", "Dashboard"],
+    },
+    {
+      id: "maint-2",
+      title: "Infrastructure Upgrades",
+      description: "Upgrading our infrastructure to improve reliability and performance.",
+      status: "scheduled",
+      startTime: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      endTime: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000 + 4 * 60 * 60 * 1000).toISOString(),
+      affectedServices: ["API", "Storage", "Webhooks"],
+    },
+    {
+      id: "maint-3",
+      title: "Security Updates",
+      description: "Applying critical security updates to all services.",
+      status: "in_progress",
+      startTime: new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString(),
+      endTime: new Date(now.getTime() + 1 * 60 * 60 * 1000).toISOString(),
+      affectedServices: ["Authentication", "Dashboard"],
+    },
+  ]
 }

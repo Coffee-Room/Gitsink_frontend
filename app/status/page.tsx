@@ -1,14 +1,8 @@
-import { Suspense, lazy } from "react"
 import type { Metadata } from "next"
 import { getMaintenanceDetails } from "@/lib/maintenance"
 import { getSystemStatus } from "@/lib/status"
-import { StatusOverviewSkeleton } from "@/components/status/status-skeleton"
-
-// Import the header component eagerly
 import StatusHeader from "@/components/status/status-header"
-
-// Lazy load the other components
-const StatusDashboard = lazy(() => import("@/components/status/status-dashboard"))
+import StatusDashboard from "@/components/status/status-dashboard"
 
 export const metadata: Metadata = {
   title: "System Status - Gitsink",
@@ -25,9 +19,7 @@ export default async function StatusPage() {
       <StatusHeader lastUpdated={status.lastUpdated} />
 
       <main className="container py-8 px-4 md:px-6">
-        <Suspense fallback={<StatusOverviewSkeleton />}>
-          <StatusDashboard maintenance={maintenance} status={status} />
-        </Suspense>
+        <StatusDashboard maintenance={maintenance} status={status} />
       </main>
     </div>
   )

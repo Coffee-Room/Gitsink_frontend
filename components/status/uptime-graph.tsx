@@ -1,75 +1,87 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import type { UptimeData } from "@/types/status"
 
 interface UptimeGraphProps {
-  data: UptimeData
+  data: UptimeData[]
 }
 
 export default function UptimeGraph({ data }: UptimeGraphProps) {
-  const getUptimePercentage = (uptime: number) => {
-    return (uptime * 100).toFixed(2)
-  }
+  const [timeRange, setTimeRange] = useState("30d")
 
-  const getStatusColor = (uptime: number) => {
-    if (uptime >= 0.99) return "bg-green-500"
-    if (uptime >= 0.95) return "bg-amber-500"
-    if (uptime >= 0.9) return "bg-orange-500"
-    return "bg-red-500"
+  // Filter data based on selected time range
+  const filteredData = data.slice(-getTimeRangeDays(timeRange))
+
+  function getTimeRangeDays(range: string): number {
+    switch (range) {
+      case "7d":
+        return 7
+      case "14d":
+        return 14
+      case "30d":
+        return 30
+      case "90d":
+        return 90
+      default:
+        return 30
+    }
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Uptime Performance</CardTitle>
-        <CardDescription>Historical uptime data for Gitsink services</CardDescription>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+          <div>
+            <CardTitle>Uptime History</CardTitle>
+            <CardDescription>Service availability over time</CardDescription>
+          </div>
+          <div className="flex items-center space-x-2 mt-2 md:mt-0">
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value)}
+              className="text-sm rounded border border-input bg-background px-3 py-1"
+            >
+              <option value="7d">Last 7 days</option>
+              <option value="14d">Last 14 days</option>
+              <option value="30d">Last 30 days</option>
+              <option value="90d">Last 90 days</option>
+            </select>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="30d">
-          <TabsList className="mb-4">
-            <TabsTrigger value="24h">24 Hours</TabsTrigger>
-            <TabsTrigger value="7d">7 Days</TabsTrigger>
-            <TabsTrigger value="30d">30 Days</TabsTrigger>
-            <TabsTrigger value="90d">90 Days</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="24h">
-            <UptimePeriod data={data.last24Hours} />
-          </TabsContent>
-
-          <TabsContent value="7d">
-            <UptimePeriod data={data.last7Days} />
-          </TabsContent>
-
-          <TabsContent value="30d">
-            <UptimePeriod data={data.last30Days} />
-          </TabsContent>
-
-          <TabsContent value="90d">
-            <UptimePeriod data={data.last90Days} />
-          </TabsContent>
-        </Tabs>
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={filteredData}
+              margin={{
+                top: 5,
+                right: 30,
+                left: 20,
+                bottom: 5,
+              }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="date"
+                tickFormatter={(value) => {
+                  const date = new Date(value)
+                  return `${date.getMonth() + 1}/${date.getDate()}`
+                }}
+              />
+              <YAxis domain={[0, 100]} tickFormatter={(value) => `${value}%`} />
+              <Tooltip
+                formatter={(value) => [`${value}%`, "Uptime"]}
+                labelFormatter={(label) => new Date(label).toLocaleDateString()}
+              />
+              <Bar dataKey="uptime" fill="#10b981" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   )
-
-  function UptimePeriod({ data }: { data: { serviceId: string; serviceName: string; uptime: number }[] }) {
-    return (
-      <div className="space-y-6">
-        {data.map((item) => (
-          <div key={item.serviceId} className="space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">{item.serviceName}</span>
-              <span className="text-sm font-medium">{getUptimePercentage(item.uptime)}%</span>
-            </div>
-            <div className="h-2 bg-muted rounded-full overflow-hidden">
-              <div className={`h-full ${getStatusColor(item.uptime)}`} style={{ width: `${item.uptime * 100}%` }}></div>
-            </div>
-          </div>
-        ))}
-      </div>
-    )
-  }
 }

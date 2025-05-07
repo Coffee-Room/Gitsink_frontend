@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X } from "lucide-react"
+import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
@@ -40,14 +40,8 @@ export default function MobileMenu() {
               />
               <span className="text-xl font-bold tracking-tight">Gitsink</span>
             </Link>
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center">
               <ThemeToggle />
-              <button
-                onClick={() => setOpen(false)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 p-1 rounded-full"
-              >
-                <X className="h-6 w-6" />
-              </button>
             </div>
           </div>
           <nav className="flex flex-col gap-6 mt-8">

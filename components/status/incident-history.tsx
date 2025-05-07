@@ -9,6 +9,7 @@ interface IncidentHistoryProps {
   incidents: Incident[]
 }
 
+// Make sure we're exporting as default
 export default function IncidentHistory({ incidents }: IncidentHistoryProps) {
   const getSeverityBadge = (severity: string) => {
     switch (severity) {

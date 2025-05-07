@@ -1,29 +1,29 @@
 "use client"
 
 import type React from "react"
-
 import { useCallback } from "react"
 
 export function useErrorLogger() {
   const logError = useCallback((error: Error, errorInfo?: React.ErrorInfo) => {
-    // In a real app, you would send this to your error tracking service
-    // like Sentry, LogRocket, etc.
-    console.error("Error caught:", error)
-    if (errorInfo) {
+    // Basic console logging with more detailed information
+    console.error("Error caught:", error.message)
+
+    // Log the error name and message
+    if (error.name) {
+      console.error("Error name:", error.name)
+    }
+
+    // Log the stack trace if available
+    if (error.stack) {
+      console.error("Stack trace:", error.stack)
+    }
+
+    // Log component stack if available
+    if (errorInfo?.componentStack) {
       console.error("Component stack:", errorInfo.componentStack)
     }
 
-    // You could also send this to your backend API
-    // Example:
-    // fetch('/api/log-error', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     message: error.message,
-    //     stack: error.stack,
-    //     componentStack: errorInfo?.componentStack
-    //   })
-    // }).catch(console.error)
+    // In a production environment, you would send this to an error tracking service
   }, [])
 
   return { logError }
