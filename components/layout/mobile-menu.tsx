@@ -1,12 +1,11 @@
-"use client"
+"\"use client"
 
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu } from "lucide-react"
+import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 export default function MobileMenu() {
   const [open, setOpen] = useState(false)
@@ -18,74 +17,68 @@ export default function MobileMenu() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
+        <Button variant="ghost" size="icon" className="md:hidden">
           <Menu className="h-6 w-6" />
           <span className="sr-only">Toggle menu</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-[280px] sm:w-[320px]">
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between px-4 py-3 border-b">
-            <Link href="/" className="flex items-center space-x-2 transition-transform duration-200 hover:scale-105">
+          <div className="flex items-center justify-between border-b pb-4">
+            <div className="flex items-center">
               <Image
                 src="/images/gitsink-logo-icon.png"
                 alt="Gitsink Logo"
-                width={28}
-                height={28}
-                className="h-7 w-auto"
+                width={32}
+                height={32}
+                className="h-8 w-auto"
               />
-              <span className="text-xl font-bold tracking-tight">Gitsink</span>
-            </Link>
-            <div className="flex items-center">
-              <ThemeToggle />
+              <span className="ml-2 text-xl font-heading font-bold tracking-tight logo-text">Gitsink</span>
             </div>
+            <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close menu</span>
+            </Button>
           </div>
           <nav className="flex flex-col gap-6 mt-8">
             <Link
-              href="#how-it-works"
-              className="text-lg font-medium text-muted-foreground transition-all duration-200 hover:text-foreground hover:translate-x-1"
+              href="/how-it-works"
+              className="text-lg font-medium text-muted-foreground transition-colors hover:text-foreground"
               onClick={handleLinkClick}
             >
               How It Works
             </Link>
             <Link
-              href="#features"
-              className="text-lg font-medium text-muted-foreground transition-all duration-200 hover:text-foreground hover:translate-x-1"
+              href="/features"
+              className="text-lg font-medium text-muted-foreground transition-colors hover:text-foreground"
               onClick={handleLinkClick}
             >
               Features
             </Link>
             <Link
-              href="#api"
-              className="text-lg font-medium text-muted-foreground transition-all duration-200 hover:text-foreground hover:translate-x-1"
-              onClick={handleLinkClick}
-            >
-              API
-            </Link>
-            <Link
-              href="#faq"
-              className="text-lg font-medium text-muted-foreground transition-all duration-200 hover:text-foreground hover:translate-x-1"
+              href="/faq"
+              className="text-lg font-medium text-muted-foreground transition-colors hover:text-foreground"
               onClick={handleLinkClick}
             >
               FAQ
             </Link>
             <Link
-              href="/status"
-              className="text-lg font-medium text-muted-foreground transition-all duration-200 hover:text-foreground hover:translate-x-1"
+              href="/contact"
+              className="text-lg font-medium text-muted-foreground transition-colors hover:text-foreground"
               onClick={handleLinkClick}
             >
-              Status
+              Contact
+            </Link>
+            <Link
+              href="/policies"
+              className="text-lg font-medium text-muted-foreground transition-colors hover:text-foreground"
+              onClick={handleLinkClick}
+            >
+              Policies
             </Link>
           </nav>
           <div className="mt-auto pt-6 border-t">
-            <Button
-              className="w-full bg-black hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 text-white transition-all duration-200 hover:scale-105"
-              onClick={() => setOpen(false)}
-            >
+            <Button className="w-full bg-black hover:bg-black/90 text-white" onClick={() => setOpen(false)}>
               Join Waitlist
             </Button>
           </div>

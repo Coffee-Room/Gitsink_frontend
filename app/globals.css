@@ -93,6 +93,54 @@ code {
     max-width: 100%;
     overflow-x: hidden;
   }
+
+  /* Animation utilities */
+  .animate-blob {
+    animation: blob 7s infinite;
+  }
+
+  .animation-delay-2000 {
+    animation-delay: 2s;
+  }
+
+  .animation-delay-4000 {
+    animation-delay: 4s;
+  }
+
+  /* Improved touch targets for mobile */
+  @media (max-width: 640px) {
+    button,
+    a,
+    [role="button"],
+    input,
+    select,
+    textarea {
+      min-height: 44px; /* Minimum touch target size */
+      min-width: 44px;
+    }
+
+    /* Prevent text from being too small on mobile */
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+  }
+
+  /* Smooth scrolling for the entire site */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Prevent content from being hidden under fixed headers on scroll to anchor */
+  html {
+    scroll-padding-top: 80px; /* Adjust based on your header height */
+  }
+
+  /* Improve tap highlight color for mobile */
+  a,
+  button,
+  [role="button"] {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+  }
 }
 
 /* Logo text styling */
@@ -100,4 +148,125 @@ code {
   font-family: var(--font-space-grotesk), system-ui, sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+/* Animations */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+/* Add these animation styles to the globals.css file */
+
+/* Typing animation for code blocks */
+.typing-animation {
+  overflow: hidden;
+  border-right: 2px solid transparent;
+  white-space: nowrap;
+  animation: typing 3s steps(40, end), blink-caret 0.75s step-end infinite;
+  animation-fill-mode: both;
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+    opacity: 1;
+  }
+  to {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: rgba(59, 130, 246, 0.5);
+  }
+}
+
+/* Flow animation for connecting lines */
+@keyframes flow {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-flow {
+  animation: flow 1.5s ease-in-out;
+}
+
+/* Hide scrollbars but maintain scrolling functionality */
+html,
+body,
+div,
+pre,
+code {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Webkit browsers (Chrome, Safari, etc.) */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+div::-webkit-scrollbar,
+pre::-webkit-scrollbar,
+code::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Ensure containers that need to scroll still function */
+.overflow-auto,
+.overflow-y-auto,
+.overflow-x-auto {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Optimize animations for devices that prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Improve mobile scrolling experience */
+.overflow-x-auto,
+.overflow-y-auto,
+.overflow-auto {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* Add active state styles for better touch feedback */
+@media (max-width: 640px) {
+  .btn:active,
+  button:active,
+  [role="button"]:active {
+    transform: scale(0.98);
+  }
 }

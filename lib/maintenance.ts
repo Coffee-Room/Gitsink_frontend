@@ -17,14 +17,16 @@ export function getMaintenanceEndTime(): string | null {
 }
 
 // Get maintenance details
-export function getMaintenanceDetails(): {
-  isActive: boolean
-  endTime: string | null
-  reason: string | null
-} {
+export function getMaintenanceDetails(): MaintenanceDetails {
   return {
     isActive: isMaintenanceMode(),
     endTime: getMaintenanceEndTime(),
     reason: process.env.MAINTENANCE_REASON || null,
   }
+}
+
+export interface MaintenanceDetails {
+  isActive: boolean
+  endTime: string | null
+  reason: string | null
 }

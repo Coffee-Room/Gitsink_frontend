@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useEffect } from "react"
 import { ThemeProvider } from "next-themes"
 import { Inter } from "next/font/google"
@@ -9,8 +8,8 @@ import { Toaster } from "@/components/ui/toaster"
 import { LoadingProvider } from "@/contexts/loading-context"
 import { GlobalLoading } from "@/components/ui/global-loading"
 import { GlobalErrorHandler } from "@/components/error-handling/global-error-handler"
+import { CookieConsent } from "@/components/cookie-consent"
 import { preloadCriticalResources, deferNonCriticalResources, optimizeThemeSwitching } from "@/lib/performance"
-import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -63,6 +62,7 @@ export default function ClientLayout({
             {children}
           </LoadingProvider>
           <Toaster />
+          <CookieConsent />
         </ThemeProvider>
       </body>
     </html>
