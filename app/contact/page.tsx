@@ -1,13 +1,13 @@
+import Header from "@/components/layout/header"
+import Footer from "@/components/layout/footer"
 import ContactHero from "@/components/contact/hero"
 import ContactForm from "@/components/contact/contact-form"
 import ContactInfo from "@/components/contact/contact-info"
 
-// Make this page dynamic
-export const dynamic = "force-dynamic"
-
 export default function ContactPage() {
   return (
     <div className="flex min-h-screen flex-col">
+      <Header />
       <main className="flex-1 relative">
         <ContactHero />
         <div className="container px-4 md:px-6 py-12 md:py-16 lg:py-20">
@@ -17,6 +17,7 @@ export default function ContactPage() {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   )
 }

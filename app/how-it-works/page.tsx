@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Header from "@/components/layout/header"
+import Footer from "@/components/layout/footer"
 import HowItWorksHero from "@/components/how-it-works/hero"
 import StepByStepProcess from "@/components/how-it-works/step-by-step"
 import HowItWorksCta from "@/components/how-it-works/cta"
@@ -24,6 +26,7 @@ export default function HowItWorksPage() {
 
   return (
     <div className="flex min-h-screen flex-col">
+      <Header />
       <main className="flex-1 relative">
         {isLoading ? (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-50">
@@ -37,6 +40,7 @@ export default function HowItWorksPage() {
           </>
         )}
       </main>
+      <Footer />
       <ScrollToTopButton />
     </div>
   )

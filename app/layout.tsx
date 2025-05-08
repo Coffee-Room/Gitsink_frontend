@@ -1,58 +1,47 @@
 import type React from "react"
-import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
+import type { Metadata } from "next"
+import { Space_Grotesk, DM_Sans } from "next/font/google"
+import { LoadingProvider } from "@/contexts/loading-context"
+import ClientLayout from "./client-layout"
 import "./globals.css"
 
-import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/toaster"
-import ClientLayout from "./client-layout"
-import { createSafeUrl } from "@/lib/url-utils"
+// Define the fonts with proper subsets and weights
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+})
 
-const inter = Inter({ subsets: ["latin"] })
-
-// Get base URL for metadata
-function getBaseUrl() {
-  // Use the public environment variables
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL
-  }
-  if (process.env.NEXT_PUBLIC_BASE_URL) {
-    return process.env.NEXT_PUBLIC_BASE_URL
-  }
-  // Fallback to hardcoded domain
-  return "https://www.gitsink.tech"
-}
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  variable: "--font-dm-sans",
+  display: "swap",
+})
 
 export const metadata: Metadata = {
-  title: {
-    default: "Gitsink - Showcase Your GitHub Projects",
-    template: "%s | Gitsink",
+  title: "Gitsink - Version Control for Your Data",
+  description:
+    "Gitsink provides Git-like version control for your data, making it easy to track changes, collaborate, and roll back when needed.",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/favicon.ico",
   },
-  description: "Gitsink helps developers turn their repos into a beautiful, structured API.",
-  metadataBase: createSafeUrl(getBaseUrl()),
     generator: 'v0.dev'
 }
 
-export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
-  width: "device-width",
-  initialScale: 1,
-}
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head />
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ClientLayout>
-            {children}
-            <Toaster />
-          </ClientLayout>
-        </ThemeProvider>
+    <html lang="en" suppressHydrationWarning className={`${spaceGrotesk.variable} ${dmSans.variable}`}>
+      <body className="min-h-screen bg-background font-sans antialiased">
+        <LoadingProvider>
+          <ClientLayout>{children}</ClientLayout>
+        </LoadingProvider>
       </body>
     </html>
   )

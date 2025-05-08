@@ -112,27 +112,7 @@ export async function joinWaitlist(formData: FormData) {
     // Initialize Supabase client
     const supabase = createServerSupabaseClient()
 
-    // First check if email already exists using the Edge Function
-    const response = await fetch("https://bqwjjqjmplvwlkhnfsva.supabase.co/functions/v1/check-duplicate-email", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
-      },
-      body: JSON.stringify({ email: data.email }),
-    })
-
-    const checkResult = await response.json()
-
-    // If the email already exists, return a success message
-    if (checkResult.exists) {
-      return {
-        success: true,
-        message: "You're already on our waitlist! We'll send you an early access code when we launch.",
-      }
-    }
-
-    // If email doesn't exist, proceed with insertion
+    // Insert data into waitlist table
     const { error } = await supabase.from("waitlist").insert([
       {
         email: data.email,
@@ -145,16 +125,15 @@ export async function joinWaitlist(formData: FormData) {
     ])
 
     if (error) {
-      console.error("Error inserting into waitlist:", error)
-
-      // Double-check for duplicate error as a fallback
+      // Check if it's a duplicate email error
       if (error.code === "23505") {
         return {
           success: true,
-          message: "You've been added to our waitlist! We'll send you an early access code when we launch.",
+          message: "You're already on our waitlist! We'll send you an early access code when we launch.",
         }
       }
 
+      console.error("Error inserting into waitlist:", error)
       return {
         success: false,
         message: "Failed to join waitlist. Please try again later.",

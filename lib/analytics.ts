@@ -85,29 +85,11 @@ export function trackEvent(
   }
 }
 
-// Add social sharing tracking
-export const trackSocialShare = (platform: string, url: string) => {
-  trackEvent("share", EventCategory.ENGAGEMENT, {
-    platform,
-    url,
-    location: typeof window !== "undefined" ? window.location.pathname : "/",
-  })
-}
-
-// Add page view tracking with enhanced metadata
-export const trackPageView = (url: string, referrer?: string) => {
+// Track page views
+export function trackPageView(url: string) {
   trackEvent(EventName.PAGE_VIEW, EventCategory.NAVIGATION, {
     url,
-    referrer: referrer || document.referrer,
-    title: document.title,
-  })
-}
-
-// Track outbound links
-export const trackOutboundLink = (url: string, label?: string) => {
-  trackEvent("outbound_link", EventCategory.ENGAGEMENT, {
-    url,
-    label: label || url,
+    referrer: document.referrer || "direct",
   })
 }
 

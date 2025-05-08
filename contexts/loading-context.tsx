@@ -11,17 +11,7 @@ interface LoadingContextType {
   allSectionsLoaded: boolean
 }
 
-// Create a default context value to avoid the "must be used within a provider" error
-const defaultContextValue: LoadingContextType = {
-  isLoading: true,
-  setIsLoading: () => {},
-  isHydrated: false,
-  sectionsLoaded: {},
-  setSectionLoaded: () => {},
-  allSectionsLoaded: false,
-}
-
-const LoadingContext = createContext<LoadingContextType>(defaultContextValue)
+const LoadingContext = createContext<LoadingContextType | undefined>(undefined)
 
 export function LoadingProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
@@ -78,6 +68,8 @@ export function LoadingProvider({ children }: { children: ReactNode }) {
 
 export function useLoading() {
   const context = useContext(LoadingContext)
-  // No need to throw an error, as we've provided a default context value
+  if (context === undefined) {
+    throw new Error("useLoading must be used within a LoadingProvider")
+  }
   return context
 }
