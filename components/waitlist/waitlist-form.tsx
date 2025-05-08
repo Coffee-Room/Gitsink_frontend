@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, CheckCircle2, Share2 } from "lucide-react"
+import { AlertCircle, CheckCircle2, Copy } from "lucide-react"
 import { joinWaitlist, generateWaitlistFormToken } from "@/app/actions/waitlist"
+import { useToast } from "@/components/ui/use-toast"
 import {
   trackConversionStart,
   trackConversionStep,
@@ -22,6 +23,7 @@ import {
 } from "@/lib/analytics"
 
 export default function WaitlistForm() {
+  const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formToken, setFormToken] = useState("")
   const [formStatus, setFormStatus] = useState<{
@@ -37,6 +39,22 @@ export default function WaitlistForm() {
     githubUsername: false,
     referralSource: false,
   })
+  const [showForm, setShowForm] = useState(true)
+  const [submittedEmail, setSubmittedEmail] = useState("")
+  const [isSharing, setIsSharing] = useState(false)
+
+  // Get the site URL from environment variable or fallback to current location
+  const getSiteUrl = () => {
+    // Use the environment variable if available
+    if (process.env.NEXT_PUBLIC_SITE_URL) {
+      // Ensure the URL doesn't have a trailing slash
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "")
+      return `${baseUrl}/waitlist`
+    }
+
+    // Fallback to current location if env var is not available
+    return typeof window !== "undefined" ? window.location.href : ""
+  }
 
   useEffect(() => {
     // Generate CSRF token when component mounts
@@ -96,6 +114,89 @@ export default function WaitlistForm() {
     }
   }
 
+  const copyToClipboard = async () => {
+    const shareUrl = getSiteUrl()
+
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      toast({
+        title: "Link copied to clipboard!",
+        description: "Share the link with your friends and colleagues.",
+        variant: "default",
+      })
+      return true
+    } catch (error) {
+      console.error("Error copying to clipboard:", error)
+      toast({
+        title: "Couldn't copy link",
+        description: "Please select and copy the URL manually from your browser's address bar.",
+        variant: "destructive",
+      })
+      return false
+    }
+  }
+
+  const handleShare = async () => {
+    if (isSharing) return
+    setIsSharing(true)
+
+    // Track share action
+    trackEvent(EventName.LINK_CLICK, EventCategory.ENGAGEMENT, {
+      action: "share",
+      context: "waitlist_success",
+    })
+
+    const shareUrl = getSiteUrl()
+
+    try {
+      // Skip Web Share API in preview/development environments
+      const isPreviewOrDev =
+        window.location.hostname.includes("localhost") ||
+        window.location.hostname.includes("vercel.app") ||
+        window.location.hostname.includes("preview")
+
+      // Only try Web Share API in production environments on supported devices
+      if (!isPreviewOrDev && navigator.share && typeof navigator.share === "function") {
+        try {
+          await navigator.share({
+            title: "Join the Gitsink Waitlist",
+            text: "I just joined the waitlist for Gitsink, a revolutionary Git-based content management system. Check it out!",
+            url: shareUrl,
+          })
+          toast({
+            title: "Shared successfully!",
+            description: "Thanks for spreading the word about Gitsink.",
+            variant: "default",
+          })
+        } catch (shareError) {
+          console.error("Web Share API error:", shareError)
+          // If permission denied or other error, fall back to clipboard
+          if (
+            (shareError as Error).name === "NotAllowedError" ||
+            (shareError as Error).message.includes("Permission denied")
+          ) {
+            await copyToClipboard()
+          } else if ((shareError as Error).name !== "AbortError") {
+            // Only show error for non-abort errors (abort means user cancelled)
+            await copyToClipboard()
+          }
+        }
+      } else {
+        // Fallback to clipboard for environments without Web Share API
+        await copyToClipboard()
+      }
+    } catch (error) {
+      console.error("Error in share handler:", error)
+      toast({
+        title: "Sharing failed",
+        description: "Please try copying the URL manually from your browser.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSharing(false)
+    }
+  }
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setIsSubmitting(true)
@@ -110,6 +211,12 @@ export default function WaitlistForm() {
       const formData = new FormData(event.currentTarget)
       formData.append("formToken", formToken)
 
+      // Save email for sharing context
+      const emailValue = formData.get("email") as string
+      if (emailValue) {
+        setSubmittedEmail(emailValue)
+      }
+
       const result = await joinWaitlist(formData)
       setFormStatus(result)
 
@@ -117,35 +224,39 @@ export default function WaitlistForm() {
         // Track successful conversion
         trackConversionComplete(ConversionGoal.WAITLIST_SIGNUP, {
           form: "waitlist",
-          email_domain: formData.get("email")?.toString().split("@")[1] || "unknown",
+          email_domain: emailValue?.split("@")[1] || "unknown",
         })
 
-        // Reset form on success - safely check if currentTarget exists and has reset method
-        if (event.currentTarget && typeof event.currentTarget.reset === "function") {
-          try {
-            event.currentTarget.reset()
-          } catch (resetError) {
-            console.error("Error resetting form:", resetError)
-            // If reset fails, manually clear inputs
-            const formElement = event.currentTarget as HTMLFormElement
-            const inputs = formElement.querySelectorAll("input")
-            inputs.forEach((input) => {
-              if (input.name !== "website") {
-                // Don't clear honeypot
-                input.value = ""
-              }
-            })
-          }
-        }
+        // Show success toast with share option
+        toast({
+          title: "Successfully joined the waitlist!",
+          description: (
+            <div className="mt-2 flex flex-col gap-3">
+              <p>We'll notify you when Gitsink launches.</p>
+              <Button
+                onClick={handleShare}
+                variant="outline"
+                className="mt-1 w-full flex items-center justify-center gap-2"
+              >
+                <Copy className="h-4 w-4" />
+                Copy Invite Link
+              </Button>
+            </div>
+          ),
+          variant: "default",
+          duration: 10000, // Show for 10 seconds to give time to share
+        })
 
-        // Get a new token for the next submission
-        try {
-          const newToken = await generateWaitlistFormToken()
-          setFormToken(newToken)
-        } catch (tokenError) {
-          console.error("Error generating new form token:", tokenError)
-        }
+        // Hide the form and show success state
+        setShowForm(false)
       } else {
+        // Show error toast
+        toast({
+          title: "Error joining waitlist",
+          description: result.message || "Please try again later.",
+          variant: "destructive",
+        })
+
         // Track form error
         trackEvent(EventName.FORM_ERROR, EventCategory.ERROR, {
           form: "waitlist",
@@ -159,9 +270,12 @@ export default function WaitlistForm() {
       }
     } catch (error) {
       console.error("Error submitting form:", error)
-      setFormStatus({
-        success: false,
-        message: "An unexpected error occurred. Please try again later.",
+
+      // Show error toast
+      toast({
+        title: "Something went wrong",
+        description: "An unexpected error occurred. Please try again later.",
+        variant: "destructive",
       })
 
       // Track error
@@ -176,28 +290,37 @@ export default function WaitlistForm() {
     }
   }
 
-  const handleShare = () => {
-    // Track share action
-    trackEvent(EventName.LINK_CLICK, EventCategory.ENGAGEMENT, {
-      action: "share",
-      context: "waitlist_success",
-    })
-
-    if (navigator.share) {
-      navigator
-        .share({
-          title: "Join the Gitsink Waitlist",
-          text: "I just joined the waitlist for Gitsink, a revolutionary Git-based content management system. Check it out!",
-          url: window.location.href,
-        })
-        .catch((error) => console.log("Error sharing:", error))
-    } else {
-      // Fallback for browsers that don't support the Web Share API
-      navigator.clipboard
-        .writeText(window.location.href)
-        .then(() => alert("Link copied to clipboard!"))
-        .catch((error) => console.error("Error copying to clipboard:", error))
-    }
+  if (!showForm) {
+    return (
+      <div className="text-center space-y-6 py-8 max-w-xl mx-auto">
+        <div className="bg-green-50 text-green-800 p-6 rounded-lg border border-green-200">
+          <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-green-600" />
+          <h3 className="text-xl font-bold mb-2">You're on the waitlist!</h3>
+          <p className="mb-4">
+            Thank you for joining the Gitsink waitlist. We'll notify you at <strong>{submittedEmail}</strong> when we
+            launch.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button onClick={handleShare} className="flex items-center gap-2" disabled={isSharing}>
+              <Copy className="h-4 w-4" />
+              {isSharing ? "Copying..." : "Copy Invite Link"}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => {
+                trackEvent(EventName.LINK_CLICK, EventCategory.NAVIGATION, {
+                  action: "return_home",
+                  context: "waitlist_success",
+                })
+                window.location.href = "/"
+              }}
+            >
+              Return to Home
+            </Button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -216,7 +339,7 @@ export default function WaitlistForm() {
           type="email"
           placeholder="your.email@example.com"
           required
-          disabled={isSubmitting || formStatus.success}
+          disabled={isSubmitting}
           onFocus={() => handleFieldFocus("email")}
         />
       </div>
@@ -227,7 +350,7 @@ export default function WaitlistForm() {
           id="name"
           name="name"
           placeholder="Your name"
-          disabled={isSubmitting || formStatus.success}
+          disabled={isSubmitting}
           onFocus={() => handleFieldFocus("name")}
         />
       </div>
@@ -239,7 +362,7 @@ export default function WaitlistForm() {
             id="company"
             name="company"
             placeholder="Your company"
-            disabled={isSubmitting || formStatus.success}
+            disabled={isSubmitting}
             onFocus={() => handleFieldFocus("company")}
           />
         </div>
@@ -250,7 +373,7 @@ export default function WaitlistForm() {
             id="githubUsername"
             name="githubUsername"
             placeholder="Your GitHub username"
-            disabled={isSubmitting || formStatus.success}
+            disabled={isSubmitting}
             onFocus={() => handleFieldFocus("githubUsername")}
           />
         </div>
@@ -262,51 +385,21 @@ export default function WaitlistForm() {
           id="referralSource"
           name="referralSource"
           placeholder="Google, Twitter, Friend, etc."
-          disabled={isSubmitting || formStatus.success}
+          disabled={isSubmitting}
           onFocus={() => handleFieldFocus("referralSource")}
         />
       </div>
 
-      {formStatus.message && (
-        <Alert
-          variant={formStatus.success ? "default" : "destructive"}
-          className={formStatus.success ? "bg-green-50 text-green-800 border-green-200" : ""}
-        >
-          {formStatus.success ? (
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-          ) : (
-            <AlertCircle className="h-4 w-4" />
-          )}
+      {formStatus.message && !formStatus.success && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
           <AlertDescription>{formStatus.message}</AlertDescription>
         </Alert>
       )}
 
-      {formStatus.success ? (
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Button type="button" className="flex items-center gap-2" onClick={handleShare}>
-            <Share2 className="h-4 w-4" />
-            Share with Friends
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              // Track return to home
-              trackEvent(EventName.LINK_CLICK, EventCategory.NAVIGATION, {
-                action: "return_home",
-                context: "waitlist_success",
-              })
-              window.location.href = "/"
-            }}
-          >
-            Return to Home
-          </Button>
-        </div>
-      ) : (
-        <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting || !formToken}>
-          {isSubmitting ? "Joining..." : "Join Waitlist"}
-        </Button>
-      )}
+      <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting || !formToken}>
+        {isSubmitting ? "Joining..." : "Join Waitlist"}
+      </Button>
     </form>
   )
 }
