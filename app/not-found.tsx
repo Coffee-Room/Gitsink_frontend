@@ -1,7 +1,6 @@
 import Link from "next/link"
-import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Search } from "lucide-react"
+import { Search } from "lucide-react"
 
 export default function NotFound() {
   return (
@@ -20,10 +19,7 @@ export default function NotFound() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild>
-              <Link href="/">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Home
-              </Link>
+              <Link href="/">Back to Home</Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href="/#how-it-works">Learn How It Works</Link>
@@ -31,8 +27,7 @@ export default function NotFound() {
           </div>
           <div className="mt-12">
             <Link href="/" className="inline-flex items-center">
-              <Image src="/images/gitsink-icon.svg" alt="Gitsink Logo" width={32} height={32} className="h-8 w-auto" />
-              <span className="ml-2 text-xl font-heading font-bold tracking-tight logo-text">Gitsink</span>
+              <span className="text-xl font-heading font-bold tracking-tight logo-text">Gitsink</span>
             </Link>
           </div>
         </div>
