@@ -11,7 +11,8 @@ export function CookieConsent() {
     // Check if user has already made a choice
     try {
       const consentGiven = localStorage.getItem("cookie-consent")
-      if (!consentGiven) {
+      // Only show the banner if no consent has been given
+      if (consentGiven === null) {
         // Show banner after a short delay
         const timer = setTimeout(() => {
           setShowBanner(true)
@@ -21,6 +22,7 @@ export function CookieConsent() {
     } catch (error) {
       // In case localStorage is not available (e.g., in incognito mode)
       console.error("Error accessing localStorage:", error)
+      setShowBanner(true) // Show banner if we can't check localStorage
     }
   }, [])
 
@@ -31,6 +33,8 @@ export function CookieConsent() {
       // Here you would initialize any tracking scripts
     } catch (error) {
       console.error("Error setting localStorage:", error)
+      // Fallback: use a session cookie if localStorage fails
+      document.cookie = "cookie-consent=all; path=/; max-age=31536000" // 1 year
     }
   }
 
@@ -41,11 +45,19 @@ export function CookieConsent() {
       // Only essential cookies will be used
     } catch (error) {
       console.error("Error setting localStorage:", error)
+      // Fallback: use a session cookie if localStorage fails
+      document.cookie = "cookie-consent=essential; path=/; max-age=31536000" // 1 year
     }
   }
 
   const dismiss = () => {
-    setShowBanner(false)
+    try {
+      localStorage.setItem("cookie-consent", "dismissed")
+      setShowBanner(false)
+    } catch (error) {
+      console.error("Error setting localStorage:", error)
+      document.cookie = "cookie-consent=dismissed; path=/; max-age=31536000" // 1 year
+    }
   }
 
   if (!showBanner) return null

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, CheckCircle2, Copy } from "lucide-react"
+import { AlertCircle, CheckCircle2, Copy, Check } from "lucide-react"
 import { joinWaitlist, generateWaitlistFormToken } from "@/app/actions/waitlist"
 import { useToast } from "@/components/ui/use-toast"
 import {
@@ -41,7 +41,8 @@ export default function WaitlistForm() {
   })
   const [showForm, setShowForm] = useState(true)
   const [submittedEmail, setSubmittedEmail] = useState("")
-  const [isSharing, setIsSharing] = useState(false)
+  const [isCopying, setIsCopying] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   // Get the site URL from environment variable or fallback to current location
   const getSiteUrl = () => {
@@ -114,86 +115,46 @@ export default function WaitlistForm() {
     }
   }
 
-  const copyToClipboard = async () => {
-    const shareUrl = getSiteUrl()
+  const handleCopyLink = async () => {
+    if (isCopying) return
+    setIsCopying(true)
 
-    try {
-      await navigator.clipboard.writeText(shareUrl)
-      toast({
-        title: "Link copied to clipboard!",
-        description: "Share the link with your friends and colleagues.",
-        variant: "default",
-      })
-      return true
-    } catch (error) {
-      console.error("Error copying to clipboard:", error)
-      toast({
-        title: "Couldn't copy link",
-        description: "Please select and copy the URL manually from your browser's address bar.",
-        variant: "destructive",
-      })
-      return false
-    }
-  }
-
-  const handleShare = async () => {
-    if (isSharing) return
-    setIsSharing(true)
-
-    // Track share action
+    // Track copy action
     trackEvent(EventName.LINK_CLICK, EventCategory.ENGAGEMENT, {
-      action: "share",
+      action: "copy_link",
       context: "waitlist_success",
     })
 
     const shareUrl = getSiteUrl()
 
     try {
-      // Skip Web Share API in preview/development environments
-      const isPreviewOrDev =
-        window.location.hostname.includes("localhost") ||
-        window.location.hostname.includes("vercel.app") ||
-        window.location.hostname.includes("preview")
-
-      // Only try Web Share API in production environments on supported devices
-      if (!isPreviewOrDev && navigator.share && typeof navigator.share === "function") {
-        try {
-          await navigator.share({
-            title: "Join the Gitsink Waitlist",
-            text: "I just joined the waitlist for Gitsink, a revolutionary Git-based content management system. Check it out!",
-            url: shareUrl,
-          })
-          toast({
-            title: "Shared successfully!",
-            description: "Thanks for spreading the word about Gitsink.",
-            variant: "default",
-          })
-        } catch (shareError) {
-          console.error("Web Share API error:", shareError)
-          // If permission denied or other error, fall back to clipboard
-          if (
-            (shareError as Error).name === "NotAllowedError" ||
-            (shareError as Error).message.includes("Permission denied")
-          ) {
-            await copyToClipboard()
-          } else if ((shareError as Error).name !== "AbortError") {
-            // Only show error for non-abort errors (abort means user cancelled)
-            await copyToClipboard()
-          }
-        }
-      } else {
-        // Fallback to clipboard for environments without Web Share API
-        await copyToClipboard()
-      }
-    } catch (error) {
-      console.error("Error in share handler:", error)
+      await navigator.clipboard.writeText(shareUrl)
+      setCopied(true)
       toast({
-        title: "Sharing failed",
-        description: "Please try copying the URL manually from your browser.",
+        title: "Link copied to clipboard!",
+        description: "Share the link with your friends and colleagues.",
+        variant: "default",
+      })
+
+      // Reset copied state after 2 seconds
+      setTimeout(() => {
+        setCopied(false)
+      }, 2000)
+    } catch (error) {
+      console.error("Error copying to clipboard:", error)
+      toast({
+        title: "Couldn't copy link",
+        description: (
+          <div>
+            <p>Please copy this link manually:</p>
+            <code className="mt-2 p-2 bg-gray-100 rounded block overflow-x-auto text-sm">{shareUrl}</code>
+          </div>
+        ),
         variant: "destructive",
+        duration: 7000,
       })
     } finally {
-      setIsSharing(false)
+      setIsCopying(false)
     }
   }
 
@@ -227,24 +188,34 @@ export default function WaitlistForm() {
           email_domain: emailValue?.split("@")[1] || "unknown",
         })
 
-        // Show success toast with share option
+        // Show success toast with copy option
         toast({
           title: "Successfully joined the waitlist!",
           description: (
             <div className="mt-2 flex flex-col gap-3">
               <p>We'll notify you when Gitsink launches.</p>
               <Button
-                onClick={handleShare}
+                onClick={handleCopyLink}
                 variant="outline"
                 className="mt-1 w-full flex items-center justify-center gap-2"
+                disabled={isCopying}
               >
-                <Copy className="h-4 w-4" />
-                Copy Invite Link
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    Copy Invite Link
+                  </>
+                )}
               </Button>
             </div>
           ),
           variant: "default",
-          duration: 10000, // Show for 10 seconds to give time to share
+          duration: 10000, // Show for 10 seconds to give time to copy
         })
 
         // Hide the form and show success state
@@ -301,9 +272,18 @@ export default function WaitlistForm() {
             launch.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button onClick={handleShare} className="flex items-center gap-2" disabled={isSharing}>
-              <Copy className="h-4 w-4" />
-              {isSharing ? "Copying..." : "Copy Invite Link"}
+            <Button onClick={handleCopyLink} className="flex items-center gap-2" disabled={isCopying}>
+              {copied ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="h-4 w-4" />
+                  Copy Invite Link
+                </>
+              )}
             </Button>
             <Button
               variant="outline"
