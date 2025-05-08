@@ -23,7 +23,7 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Gitsink - Instant Project Data from Git Repositories",
   description:
-    "Gitsink lets developers access all their project data from Git with a single API call, making it easy to integrate, display, and manage project insights anywhere."
+    "Gitsink lets developers access all their project data from Git with a single API call, making it easy to integrate, display, and manage project insights anywhere.",
   icons: {
     icon: "/favicon.ico",
     apple: "/favicon.ico",
