@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import WaitlistHero from "@/components/waitlist/waitlist-hero"
 import WaitlistForm from "@/components/waitlist/waitlist-form"
-import Header from "@/components/layout/header"
 
 export const metadata: Metadata = {
   title: "Join the Waitlist | Gitsink",

@@ -1,8 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Header from "@/components/layout/header"
-import Footer from "@/components/layout/footer"
 import HowItWorksHero from "@/components/how-it-works/hero"
 import StepByStepProcess from "@/components/how-it-works/step-by-step"
 import HowItWorksCta from "@/components/how-it-works/cta"
@@ -39,7 +37,6 @@ export default function HowItWorksPage() {
           </>
         )}
       </main>
-      <Footer />
       <ScrollToTopButton />
     </div>
   )

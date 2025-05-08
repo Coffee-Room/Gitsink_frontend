@@ -112,6 +112,17 @@ export async function joinWaitlist(formData: FormData) {
     // Initialize Supabase client
     const supabase = createServerSupabaseClient()
 
+    // First check if email already exists
+    const { data: existingUser } = await supabase.from("waitlist").select("email").eq("email", data.email).single()
+
+    if (existingUser) {
+      // Email already exists, return success message
+      return {
+        success: true,
+        message: "You're already on our waitlist! We'll send you an early access code when we launch.",
+      }
+    }
+
     // Insert data into waitlist table
     const { error } = await supabase.from("waitlist").insert([
       {
@@ -125,7 +136,10 @@ export async function joinWaitlist(formData: FormData) {
     ])
 
     if (error) {
-      // Check if it's a duplicate email error
+      // Handle other database errors
+      console.error("Error inserting into waitlist:", error)
+
+      // Check if it's a duplicate email error (should be caught by the check above, but just in case)
       if (error.code === "23505") {
         return {
           success: true,
@@ -133,7 +147,6 @@ export async function joinWaitlist(formData: FormData) {
         }
       }
 
-      console.error("Error inserting into waitlist:", error)
       return {
         success: false,
         message: "Failed to join waitlist. Please try again later.",

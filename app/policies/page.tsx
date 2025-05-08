@@ -4,7 +4,6 @@ import PoliciesCta from "@/components/policies/cta"
 import PoliciesNavigation from "@/components/policies/policies-navigation"
 import { LanguageProvider } from "@/contexts/language-context"
 import LanguageSelector from "@/components/policies/language-selector"
-import Header from "@/components/layout/header"
 
 export const metadata = {
   title: "Policies | Gitsink",
