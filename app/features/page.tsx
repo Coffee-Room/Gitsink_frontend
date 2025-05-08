@@ -1,5 +1,4 @@
 import Header from "@/components/layout/header"
-import Footer from "@/components/layout/footer"
 import FeaturesHero from "@/components/features/hero-updated"
 import ProblemSolution from "@/components/features/problem-solution"
 import CoreFeatures from "@/components/features/core-features"
@@ -20,7 +19,6 @@ export default function FeaturesPage() {
         <Testimonials />
         <FeaturesCta />
       </main>
-      <Footer />
       <ScrollToTopButton />
     </div>
   )

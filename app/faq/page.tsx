@@ -1,5 +1,4 @@
 import Header from "@/components/layout/header"
-import Footer from "@/components/layout/footer"
 import FaqHero from "@/components/faq/hero"
 import FaqList from "@/components/faq/faq-list"
 import FaqCta from "@/components/faq/cta"
@@ -14,7 +13,6 @@ export default function FaqPage() {
         <FaqList />
         <FaqCta />
       </main>
-      <Footer />
       <ScrollToTopButton />
     </div>
   )
