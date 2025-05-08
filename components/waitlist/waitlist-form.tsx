@@ -120,11 +120,31 @@ export default function WaitlistForm() {
           email_domain: formData.get("email")?.toString().split("@")[1] || "unknown",
         })
 
-        // Reset form on success
-        event.currentTarget.reset()
+        // Reset form on success - safely check if currentTarget exists and has reset method
+        if (event.currentTarget && typeof event.currentTarget.reset === "function") {
+          try {
+            event.currentTarget.reset()
+          } catch (resetError) {
+            console.error("Error resetting form:", resetError)
+            // If reset fails, manually clear inputs
+            const formElement = event.currentTarget as HTMLFormElement
+            const inputs = formElement.querySelectorAll("input")
+            inputs.forEach((input) => {
+              if (input.name !== "website") {
+                // Don't clear honeypot
+                input.value = ""
+              }
+            })
+          }
+        }
+
         // Get a new token for the next submission
-        const newToken = await generateWaitlistFormToken()
-        setFormToken(newToken)
+        try {
+          const newToken = await generateWaitlistFormToken()
+          setFormToken(newToken)
+        } catch (tokenError) {
+          console.error("Error generating new form token:", tokenError)
+        }
       } else {
         // Track form error
         trackEvent(EventName.FORM_ERROR, EventCategory.ERROR, {
