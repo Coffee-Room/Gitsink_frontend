@@ -24,6 +24,14 @@ export function useErrorLogger() {
       })
     }
 
+    // Special handling for fetch errors
+    if (error.message.includes("fetch") || error.message.includes("Failed to fetch")) {
+      console.error("Fetch Error Details:", {
+        message: error.message,
+        stack: error.stack,
+      })
+    }
+
     if (error.stack) {
       console.error("Error stack:", error.stack)
     }
