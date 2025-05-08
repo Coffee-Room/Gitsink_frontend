@@ -1,7 +1,3 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Search } from "lucide-react"
-
 export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col">
@@ -9,26 +5,24 @@ export default function NotFound() {
         <div className="container max-w-md px-4 py-16 sm:py-24 md:py-32 text-center">
           <div className="mb-8 flex justify-center">
             <div className="rounded-full bg-primary/10 p-4">
-              <Search className="h-10 w-10 text-primary" />
+              <div className="h-10 w-10 text-primary">404</div>
             </div>
           </div>
-          <h1 className="text-4xl font-heading font-bold tracking-tight sm:text-5xl mb-4">404</h1>
-          <h2 className="text-2xl font-heading font-semibold tracking-tight sm:text-3xl mb-6">Page Not Found</h2>
-          <p className="mb-8 text-muted-foreground">
-            The page you're looking for doesn't exist or has been moved. Let's get you back on track.
-          </p>
+          <h1 className="text-4xl font-heading font-bold tracking-tight sm:text-5xl mb-4">Page Not Found</h1>
+          <p className="mb-8 text-muted-foreground">The page you're looking for doesn't exist or has been moved.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild>
-              <Link href="/">Back to Home</Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href="/#how-it-works">Learn How It Works</Link>
-            </Button>
-          </div>
-          <div className="mt-12">
-            <Link href="/" className="inline-flex items-center">
-              <span className="text-xl font-heading font-bold tracking-tight logo-text">Gitsink</span>
-            </Link>
+            <a
+              href="/"
+              className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+            >
+              Back to Home
+            </a>
+            <a
+              href="/#how-it-works"
+              className="inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+            >
+              Learn How It Works
+            </a>
           </div>
         </div>
       </main>
