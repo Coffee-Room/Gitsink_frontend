@@ -37,10 +37,6 @@ export default function WaitlistForm() {
     githubUsername: false,
     referralSource: false,
   })
-  const [shareStatus, setShareStatus] = useState<{
-    success?: boolean
-    message?: string
-  }>({})
 
   useEffect(() => {
     // Generate CSRF token when component mounts
@@ -180,56 +176,28 @@ export default function WaitlistForm() {
     }
   }
 
-  const handleShare = async () => {
+  const handleShare = () => {
     // Track share action
     trackEvent(EventName.LINK_CLICK, EventCategory.ENGAGEMENT, {
       action: "share",
       context: "waitlist_success",
     })
 
-    const shareData = {
-      title: "Join the Gitsink Waitlist",
-      text: "I just joined the waitlist for Gitsink, a revolutionary Git-based content management system. Check it out!",
-      url: window.location.href,
-    }
-
-    try {
-      if (navigator.share && typeof navigator.share === "function") {
-        // Use Web Share API if available
-        await navigator.share(shareData)
-        setShareStatus({ success: true, message: "Successfully shared!" })
-      } else {
-        // Fallback to clipboard
-        await navigator.clipboard.writeText(window.location.href)
-        setShareStatus({ success: true, message: "Link copied to clipboard!" })
-      }
-    } catch (error) {
-      console.error("Error sharing:", error)
-
-      // If sharing fails, try clipboard as a fallback
-      if (!navigator.share || error.name === "AbortError") {
-        try {
-          await navigator.clipboard.writeText(window.location.href)
-          setShareStatus({ success: true, message: "Link copied to clipboard!" })
-        } catch (clipboardError) {
-          console.error("Error copying to clipboard:", clipboardError)
-          setShareStatus({
-            success: false,
-            message: "Couldn't share or copy link. Please copy the URL manually.",
-          })
-        }
-      } else {
-        setShareStatus({
-          success: false,
-          message: "Sharing failed. Please try again or copy the URL manually.",
+    if (navigator.share) {
+      navigator
+        .share({
+          title: "Join the Gitsink Waitlist",
+          text: "I just joined the waitlist for Gitsink, a revolutionary Git-based content management system. Check it out!",
+          url: window.location.href,
         })
-      }
+        .catch((error) => console.log("Error sharing:", error))
+    } else {
+      // Fallback for browsers that don't support the Web Share API
+      navigator.clipboard
+        .writeText(window.location.href)
+        .then(() => alert("Link copied to clipboard!"))
+        .catch((error) => console.error("Error copying to clipboard:", error))
     }
-
-    // Clear share status after 3 seconds
-    setTimeout(() => {
-      setShareStatus({})
-    }, 3000)
   }
 
   return (
@@ -338,20 +306,6 @@ export default function WaitlistForm() {
         <Button type="submit" className="w-full md:w-auto" disabled={isSubmitting || !formToken}>
           {isSubmitting ? "Joining..." : "Join Waitlist"}
         </Button>
-      )}
-
-      {shareStatus.message && (
-        <Alert
-          variant={shareStatus.success ? "default" : "destructive"}
-          className={shareStatus.success ? "bg-green-50 text-green-800 border-green-200 mt-4" : "mt-4"}
-        >
-          {shareStatus.success ? (
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-          ) : (
-            <AlertCircle className="h-4 w-4" />
-          )}
-          <AlertDescription>{shareStatus.message}</AlertDescription>
-        </Alert>
       )}
     </form>
   )
