@@ -1,25 +1,22 @@
+import type { Metadata } from "next"
 import Header from "@/components/layout/header"
-import FeaturesHero from "@/components/features/hero-updated"
-import ProblemSolution from "@/components/features/problem-solution"
-import CoreFeatures from "@/components/features/core-features"
-import ApiExamples from "@/components/features/api-examples"
-import Testimonials from "@/components/features/testimonials"
-import FeaturesCta from "@/components/features/cta"
-import ScrollToTopButton from "@/components/ui/scroll-to-top-button"
+import FeaturesClientWrapper from "@/components/features/features-client-wrapper"
+import Footer from "@/components/layout/footer"
+
+export const metadata: Metadata = {
+  title: "Features - Gitsink",
+  description:
+    "Discover how Gitsink transforms your GitHub projects into a versatile API for websites, bots, plugins, and beyond.",
+}
 
 export default function FeaturesPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="flex-1 relative">
-        <FeaturesHero />
-        <ProblemSolution />
-        <CoreFeatures />
-        <ApiExamples />
-        <Testimonials />
-        <FeaturesCta />
+        <FeaturesClientWrapper />
       </main>
-      <ScrollToTopButton />
+      <Footer />
     </div>
   )
 }
