@@ -1,82 +1,99 @@
 "use client"
 
-import { useEffect, useRef, useState, type ReactNode } from "react"
-import { useInView } from "@/hooks/use-in-view"
+import { useEffect, useState, type ReactNode } from "react"
+import { useInView } from "react-intersection-observer"
 import { useReducedMotion } from "@/hooks/use-reduced-motion"
-import { useIsMobile } from "@/hooks/use-is-mobile"
+
+type AnimationType = "fade" | "slide-up" | "slide-down" | "slide-left" | "slide-right" | "zoom" | "none"
 
 interface CoordinatedAnimationProps {
   children: ReactNode
+  type?: AnimationType
   delay?: number
-  type: "fade" | "slide-up" | "slide-down" | "slide-left" | "slide-right" | "zoom"
-  className?: string
+  duration?: number
   threshold?: number
   once?: boolean
+  className?: string
 }
 
 export function CoordinatedAnimation({
   children,
-  delay = 0,
   type = "fade",
-  className = "",
+  delay = 0,
+  duration = 500,
   threshold = 0.1,
   once = true,
+  className = "",
 }: CoordinatedAnimationProps) {
-  const [isVisible, setIsVisible] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { threshold, once })
   const prefersReducedMotion = useReducedMotion()
-  const isMobile = useIsMobile()
-  const hasAnimated = useRef(false)
+  const [ref, inView] = useInView({
+    triggerOnce: once,
+    threshold,
+    // Skip if SSR
+    skip: typeof window === "undefined",
+  })
+  const [hasAnimated, setHasAnimated] = useState(false)
 
-  // Simplify animations on mobile
-  const mobileOptimizedDelay = isMobile ? Math.min(delay, 200) : delay
-
+  // Handle animation state
   useEffect(() => {
-    if (prefersReducedMotion) {
-      setIsVisible(true)
-      return
-    }
-
-    if (inView && !hasAnimated.current) {
+    if (inView && !hasAnimated) {
       const timer = setTimeout(() => {
-        setIsVisible(true)
-        hasAnimated.current = true
-      }, mobileOptimizedDelay)
+        setHasAnimated(true)
+      }, delay)
 
       return () => clearTimeout(timer)
     }
-  }, [inView, mobileOptimizedDelay, prefersReducedMotion])
+    return () => {}
+  }, [inView, delay, hasAnimated])
 
-  // If user prefers reduced motion, skip animations
+  // If user prefers reduced motion, don't animate
   if (prefersReducedMotion) {
     return <div className={className}>{children}</div>
   }
 
-  const getAnimationStyles = () => {
-    if (!isVisible) {
-      switch (type) {
-        case "fade":
-          return "opacity-0"
-        case "slide-up":
-          return "opacity-0 translate-y-8"
-        case "slide-down":
-          return "opacity-0 -translate-y-8"
-        case "slide-left":
-          return "opacity-0 translate-x-8"
-        case "slide-right":
-          return "opacity-0 -translate-x-8"
-        case "zoom":
-          return "opacity-0 scale-95"
-        default:
-          return "opacity-0"
-      }
+  // Initial styles based on animation type
+  const getInitialStyles = (): string => {
+    if (typeof window === "undefined") return className // Return just the className for SSR
+
+    if (type === "none" || hasAnimated) return className
+
+    switch (type) {
+      case "fade":
+        return `opacity-0 ${className}`
+      case "slide-up":
+        return `opacity-0 translate-y-8 ${className}`
+      case "slide-down":
+        return `opacity-0 -translate-y-8 ${className}`
+      case "slide-left":
+        return `opacity-0 translate-x-8 ${className}`
+      case "slide-right":
+        return `opacity-0 -translate-x-8 ${className}`
+      case "zoom":
+        return `opacity-0 scale-95 ${className}`
+      default:
+        return className
     }
-    return "opacity-100 translate-x-0 translate-y-0 scale-100"
+  }
+
+  // Animation styles
+  const getAnimationStyles = (): string => {
+    if (typeof window === "undefined") return "" // Return empty string for SSR
+
+    if (type === "none") return ""
+
+    const transitionDuration = `${duration}ms`
+    const transitionDelay = delay > 0 ? `${delay}ms` : ""
+
+    return `transition-all ease-out ${
+      transitionDuration ? `duration-${Math.floor(duration / 100)}00` : ""
+    } ${transitionDelay ? `delay-${Math.floor(delay / 100)}00` : ""}`
   }
 
   return (
-    <div ref={ref} className={`transition-all duration-700 ease-out ${getAnimationStyles()} ${className}`}>
+    <div
+      ref={ref}
+      className={`${getInitialStyles()} ${hasAnimated ? "opacity-100 translate-x-0 translate-y-0 scale-100" : ""} ${getAnimationStyles()}`}
+    >
       {children}
     </div>
   )

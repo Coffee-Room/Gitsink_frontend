@@ -1,47 +1,51 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useState, useEffect, type RefObject } from "react"
 
 interface UseInViewOptions {
-  threshold?: number
+  root?: Element | null
   rootMargin?: string
+  threshold?: number | number[]
   triggerOnce?: boolean
+  skip?: boolean
 }
 
-export function useInView({ threshold = 0.1, rootMargin = "0px", triggerOnce = true }: UseInViewOptions = {}) {
-  const ref = useRef<HTMLElement | null>(null)
+export function useInView({
+  root = null,
+  rootMargin = "0px",
+  threshold = 0,
+  triggerOnce = false,
+  skip = false,
+}: UseInViewOptions = {}): [RefObject<Element>, boolean] {
+  const [ref, setRef] = useState<Element | null>(null)
   const [isInView, setIsInView] = useState(false)
 
   useEffect(() => {
-    const element = ref.current
-    if (!element) return
+    // Skip if SSR or explicitly skipped
+    if (typeof window === "undefined" || skip) {
+      return
+    }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const [entry] = entries
-        if (entry.isIntersecting) {
-          setIsInView(true)
-          if (triggerOnce) {
-            observer.unobserve(element)
+    if (ref) {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          const inView = entry.isIntersecting
+          setIsInView(inView)
+
+          if (inView && triggerOnce) {
+            observer.unobserve(ref)
           }
-        } else if (!triggerOnce) {
-          setIsInView(false)
-        }
-      },
-      {
-        threshold,
-        rootMargin,
-      },
-    )
+        },
+        { root, rootMargin, threshold },
+      )
 
-    observer.observe(element)
+      observer.observe(ref)
 
-    return () => {
-      if (element) {
-        observer.unobserve(element)
+      return () => {
+        observer.disconnect()
       }
     }
-  }, [threshold, rootMargin, triggerOnce])
+  }, [ref, root, rootMargin, threshold, triggerOnce, skip])
 
-  return { ref, isInView }
+  return [setRef as unknown as RefObject<Element>, isInView]
 }

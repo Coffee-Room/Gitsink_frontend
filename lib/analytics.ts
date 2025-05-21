@@ -1,154 +1,164 @@
-// Analytics utility functions
-import { track } from "@vercel/analytics"
+// Enum for tracking conversion goals
+export enum ConversionGoal {
+  WAITLIST_SIGNUP = "waitlist_signup",
+  CONTACT_SUBMISSION = "contact_submission",
+  DOCUMENTATION_VIEW = "documentation_view",
+  GITHUB_VISIT = "github_visit",
+  FEATURE_EXPLORATION = "feature_exploration",
+  DOCUMENTATION_ENGAGEMENT = "documentation_engagement",
+  DEMO_INTERACTION = "demo_interaction",
+}
 
-// Define event categories
-export const EventCategory = {
-  NAVIGATION: "navigation",
-  ENGAGEMENT: "engagement",
-  CONVERSION: "conversion",
-  FEATURE: "feature",
-  ERROR: "error",
-} as const
+// Enum for tracking funnel steps
+export enum FunnelStep {
+  AWARENESS = "awareness",
+  INTEREST = "interest",
+  CONSIDERATION = "consideration",
+  INTENT = "intent",
+  EVALUATION = "evaluation",
+  CONVERSION = "conversion",
+}
 
-// Define event names
-export const EventName = {
-  // Navigation events
-  PAGE_VIEW: "page_view",
-  LINK_CLICK: "link_click",
-  MENU_OPEN: "menu_open",
+// Enum for event categories
+export enum EventCategory {
+  ENGAGEMENT = "engagement",
+  CONVERSION = "conversion",
+  ERROR = "error",
+  NAVIGATION = "navigation",
+  FEATURE = "feature",
+}
 
-  // Engagement events
-  SCROLL_DEPTH: "scroll_depth",
-  TIME_ON_PAGE: "time_on_page",
-  VIDEO_PLAY: "video_play",
+// Enum for event names
+export enum EventName {
+  PAGE_VIEW = "page_view",
+  BUTTON_CLICK = "button_click",
+  FORM_SUBMIT = "form_submit",
+  FORM_ERROR = "form_error",
+  LINK_CLICK = "link_click",
+  SCROLL_DEPTH = "scroll_depth",
+  TIME_ON_PAGE = "time_on_page",
+  VIDEO_PLAY = "video_play",
+  MENU_OPEN = "menu_open",
+  WAITLIST_SUBMIT = "waitlist_submit",
+  CONTACT_SUBMIT = "contact_submit",
+  GITHUB_CLICK = "github_click",
+  CONVERSION_START = "conversion_start",
+  CONVERSION_STEP = "conversion_step",
+  CONVERSION_COMPLETE = "conversion_complete",
+  CONVERSION_ABANDON = "conversion_abandon",
+  FEATURE_TOGGLE = "feature_toggle",
+  THEME_SWITCH = "theme_switch",
+  LANGUAGE_CHANGE = "language_change",
+  API_ERROR = "api_error",
+  JS_ERROR = "js_error",
+}
 
-  // Conversion events
-  WAITLIST_SUBMIT: "waitlist_submit",
-  CONTACT_SUBMIT: "contact_submit",
-  GITHUB_CLICK: "github_click",
-  CONVERSION_START: "conversion_start",
-  CONVERSION_STEP: "conversion_step",
-  CONVERSION_COMPLETE: "conversion_complete",
-  CONVERSION_ABANDON: "conversion_abandon",
+// Function to track a generic event
+export function trackEvent(name: EventName, category: EventCategory, properties?: Record<string, any>) {
+  // Safe check for browser environment
+  if (typeof window === "undefined") {
+    return
+  }
 
-  // Feature events
-  FEATURE_TOGGLE: "feature_toggle",
-  THEME_SWITCH: "theme_switch",
-  LANGUAGE_CHANGE: "language_change",
-
-  // Error events
-  FORM_ERROR: "form_error",
-  API_ERROR: "api_error",
-  JS_ERROR: "js_error",
-} as const
-
-// Define conversion goals
-export const ConversionGoal = {
-  WAITLIST_SIGNUP: "waitlist_signup",
-  CONTACT_SUBMISSION: "contact_submission",
-  GITHUB_VISIT: "github_visit",
-  FEATURE_EXPLORATION: "feature_exploration",
-  DOCUMENTATION_ENGAGEMENT: "documentation_engagement",
-  DEMO_INTERACTION: "demo_interaction",
-} as const
-
-// Define conversion funnel steps
-export const FunnelStep = {
-  AWARENESS: "awareness",
-  INTEREST: "interest",
-  CONSIDERATION: "consideration",
-  INTENT: "intent",
-  EVALUATION: "evaluation",
-  CONVERSION: "conversion",
-} as const
-
-// Track a custom event
-export function trackEvent(
-  eventName: (typeof EventName)[keyof typeof EventName],
-  category: (typeof EventCategory)[keyof typeof EventCategory],
-  properties?: Record<string, string | number | boolean>,
-) {
   try {
-    track(eventName, {
-      category,
-      ...properties,
-    })
-
+    // Log to console in development
     if (process.env.NODE_ENV === "development") {
-      console.log(`[Analytics] Tracked event: ${eventName}`, {
-        category,
-        ...properties,
-      })
+      console.log(`[Analytics] Event: ${name}, Category: ${category}`, properties)
     }
+
+    // Here you would typically send the event to your analytics provider
+    // Example:
+    // window.analytics?.track(name, { category, ...properties });
   } catch (error) {
-    console.error("[Analytics] Error tracking event:", error)
+    console.error("Error tracking event:", error)
   }
 }
 
-// Track page views
+// Function to track page views
 export function trackPageView(url: string) {
+  // Safe check for browser environment
+  if (typeof window === "undefined") {
+    return
+  }
+
+  const referrer = typeof document !== "undefined" ? document.referrer || "direct" : "direct"
+
   trackEvent(EventName.PAGE_VIEW, EventCategory.NAVIGATION, {
     url,
-    referrer: document.referrer || "direct",
+    referrer,
   })
 }
 
-// Track conversion start
-export function trackConversionStart(
-  goal: (typeof ConversionGoal)[keyof typeof ConversionGoal],
-  funnelStep: (typeof FunnelStep)[keyof typeof FunnelStep],
-  properties?: Record<string, string | number | boolean>,
-) {
+// Function to track the start of a conversion funnel
+export function trackConversionStart(goal: ConversionGoal, step: FunnelStep, properties?: Record<string, any>) {
+  // Safe check for browser environment
+  if (typeof window === "undefined") {
+    return
+  }
+
   trackEvent(EventName.CONVERSION_START, EventCategory.CONVERSION, {
-    goal,
-    funnel_step: funnelStep,
+    conversion_goal: goal,
+    funnel_step: step,
     ...properties,
   })
 }
 
-// Track conversion step
+// Function to track a step in a conversion funnel
 export function trackConversionStep(
-  goal: (typeof ConversionGoal)[keyof typeof ConversionGoal],
-  funnelStep: (typeof FunnelStep)[keyof typeof FunnelStep],
-  stepName: string,
-  stepIndex: number,
+  goal: ConversionGoal,
+  step: FunnelStep,
+  action: string,
+  currentStep: number,
   totalSteps: number,
-  properties?: Record<string, string | number | boolean>,
+  properties?: Record<string, any>,
 ) {
+  // Safe check for browser environment
+  if (typeof window === "undefined") {
+    return
+  }
+
   trackEvent(EventName.CONVERSION_STEP, EventCategory.CONVERSION, {
-    goal,
-    funnel_step: funnelStep,
-    step_name: stepName,
-    step_index: stepIndex,
+    conversion_goal: goal,
+    funnel_step: step,
+    action,
+    current_step: currentStep,
     total_steps: totalSteps,
-    progress_percentage: Math.round((stepIndex / totalSteps) * 100),
+    progress_percentage: Math.round((currentStep / totalSteps) * 100),
     ...properties,
   })
 }
 
-// Track conversion complete
-export function trackConversionComplete(
-  goal: (typeof ConversionGoal)[keyof typeof ConversionGoal],
-  properties?: Record<string, string | number | boolean>,
-) {
+// Function to track a completed conversion
+export function trackConversionComplete(goal: ConversionGoal, properties?: Record<string, any>) {
+  // Safe check for browser environment
+  if (typeof window === "undefined") {
+    return
+  }
+
   trackEvent(EventName.CONVERSION_COMPLETE, EventCategory.CONVERSION, {
-    goal,
+    conversion_goal: goal,
+    funnel_complete: true,
     funnel_step: FunnelStep.CONVERSION,
     ...properties,
   })
 }
 
-// Track conversion abandon
+// Function to track an abandoned conversion
 export function trackConversionAbandon(
-  goal: (typeof ConversionGoal)[keyof typeof ConversionGoal],
-  funnelStep: (typeof FunnelStep)[keyof typeof FunnelStep],
-  reason?: string,
-  properties?: Record<string, string | number | boolean>,
+  goal: ConversionGoal,
+  step: FunnelStep,
+  reason: string,
+  properties?: Record<string, any>,
 ) {
-  trackEvent(EventName.CONVERSION_ABANDON, EventCategory.CONVERSION, {
-    goal,
-    funnel_step: funnelStep,
-    reason,
+  // Safe check for browser environment
+  if (typeof window === "undefined") {
+    return
+  }
+
+  trackEvent(EventName.CONVERSION_ABANDON, EventCategory.ERROR, {
+    conversion_goal: goal,
+    funnel_step: step,
+    abandon_reason: reason,
     ...properties,
   })
 }
@@ -251,16 +261,15 @@ export function initConversionPageTracking() {
   const path = window.location.pathname
 
   // Map paths to conversion goals and funnel steps
-  const pathMappings: Record<
-    string,
-    { goal: (typeof ConversionGoal)[keyof typeof ConversionGoal]; step: (typeof FunnelStep)[keyof typeof FunnelStep] }
-  > = {
+  const pathMappings: Record<string, { goal: ConversionGoal; step: FunnelStep }> = {
     "/": { goal: ConversionGoal.WAITLIST_SIGNUP, step: FunnelStep.AWARENESS },
     "/features": { goal: ConversionGoal.FEATURE_EXPLORATION, step: FunnelStep.INTEREST },
     "/how-it-works": { goal: ConversionGoal.FEATURE_EXPLORATION, step: FunnelStep.CONSIDERATION },
     "/faq": { goal: ConversionGoal.DOCUMENTATION_ENGAGEMENT, step: FunnelStep.EVALUATION },
     "/contact": { goal: ConversionGoal.CONTACT_SUBMISSION, step: FunnelStep.INTENT },
     "/waitlist": { goal: ConversionGoal.WAITLIST_SIGNUP, step: FunnelStep.INTENT },
+    "/api": { goal: ConversionGoal.DOCUMENTATION_ENGAGEMENT, step: FunnelStep.CONSIDERATION },
+    "/login": { goal: ConversionGoal.GITHUB_VISIT, step: FunnelStep.INTENT },
   }
 
   // Track conversion start based on page visit

@@ -35,7 +35,7 @@ export default function Header() {
             Features
           </Link>
           <Link
-            href="#api"
+            href="/api"
             className="text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all hover:after:w-full"
           >
             API

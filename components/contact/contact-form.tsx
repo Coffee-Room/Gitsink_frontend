@@ -55,7 +55,7 @@ export default function ContactForm() {
     // Track conversion start when form is viewed
     trackConversionStart(ConversionGoal.CONTACT_SUBMISSION, FunnelStep.INTENT, {
       form: "contact",
-      source: document.referrer || "direct",
+      source: typeof document !== "undefined" ? document.referrer || "direct" : "direct",
     })
 
     // Track form abandonment
@@ -68,10 +68,14 @@ export default function ContactForm() {
       }
     }
 
-    window.addEventListener("beforeunload", handleBeforeUnload)
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload)
+    if (typeof window !== "undefined") {
+      window.addEventListener("beforeunload", handleBeforeUnload)
+      return () => {
+        window.removeEventListener("beforeunload", handleBeforeUnload)
+      }
     }
+
+    return () => {}
   }, [formStarted, formFields, formStatus.success])
 
   const handleFieldFocus = (field: keyof typeof formFields) => {
