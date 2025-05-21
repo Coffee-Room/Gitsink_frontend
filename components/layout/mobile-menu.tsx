@@ -2,77 +2,94 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu } from "lucide-react"
 
 export default function MobileMenu() {
-  const [open, setOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen)
+    // Prevent scrolling when menu is open
+    if (!isOpen) {
+      document.body.style.overflow = "hidden"
+    } else {
+      document.body.style.overflow = "auto"
+    }
+  }
+
+  const closeMenu = () => {
+    setIsOpen(false)
+    document.body.style.overflow = "auto"
+  }
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu className="h-5 w-5" />
-          <span className="sr-only">Toggle menu</span>
-        </Button>
-      </SheetTrigger>
-      <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-        <nav className="flex flex-col gap-4 mt-8">
-          <Link
-            href="/how-it-works"
-            className="text-lg font-medium transition-colors hover:text-primary"
-            onClick={() => setOpen(false)}
-          >
-            How It Works
-          </Link>
-          <Link
-            href="/features"
-            className="text-lg font-medium transition-colors hover:text-primary"
-            onClick={() => setOpen(false)}
-          >
-            Features
-          </Link>
-          <Link
-            href="#api"
-            className="text-lg font-medium transition-colors hover:text-primary"
-            onClick={() => setOpen(false)}
-          >
-            API
-          </Link>
-          <Link
-            href="/faq"
-            className="text-lg font-medium transition-colors hover:text-primary"
-            onClick={() => setOpen(false)}
-          >
-            FAQ
-          </Link>
-          <Link
-            href="/contact"
-            className="text-lg font-medium transition-colors hover:text-primary"
-            onClick={() => setOpen(false)}
-          >
-            Contact
-          </Link>
-          <Link
-            href="/status"
-            className="text-lg font-medium transition-colors hover:text-primary"
-            onClick={() => setOpen(false)}
-          >
-            Status
-          </Link>
-          <Link
-            href="/policies"
-            className="text-lg font-medium transition-colors hover:text-primary"
-            onClick={() => setOpen(false)}
-          >
-            Policies
-          </Link>
-          <Link href="/waitlist" onClick={() => setOpen(false)}>
-            <Button className="w-full mt-2">Join Waitlist</Button>
-          </Link>
-        </nav>
-      </SheetContent>
-    </Sheet>
+    <div className="md:hidden">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-9 w-9 rounded-full"
+        aria-label="Toggle Menu"
+        onClick={toggleMenu}
+      >
+        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+      </Button>
+
+      {isOpen && (
+        <div className="fixed inset-0 top-16 z-50 bg-background">
+          <nav className="container flex flex-col space-y-4 px-4 py-8">
+            <Link
+              href="/"
+              className="text-lg font-medium py-2 transition-colors hover:text-primary"
+              onClick={closeMenu}
+            >
+              Home
+            </Link>
+            <Link
+              href="/how-it-works"
+              className="text-lg font-medium py-2 transition-colors hover:text-primary"
+              onClick={closeMenu}
+            >
+              How It Works
+            </Link>
+            <Link
+              href="/features"
+              className="text-lg font-medium py-2 transition-colors hover:text-primary"
+              onClick={closeMenu}
+            >
+              Features
+            </Link>
+            <Link
+              href="/developer"
+              className="text-lg font-medium py-2 transition-colors hover:text-primary"
+              onClick={closeMenu}
+            >
+              Developers
+            </Link>
+            <Link
+              href="/faq"
+              className="text-lg font-medium py-2 transition-colors hover:text-primary"
+              onClick={closeMenu}
+            >
+              FAQ
+            </Link>
+            <Link
+              href="/status"
+              className="text-lg font-medium py-2 transition-colors hover:text-primary"
+              onClick={closeMenu}
+            >
+              Status
+            </Link>
+            <Link
+              href="/waitlist"
+              className="text-lg font-medium py-2 transition-colors hover:text-primary"
+              onClick={closeMenu}
+            >
+              Join Waitlist
+            </Link>
+          </nav>
+        </div>
+      )}
+    </div>
   )
 }
