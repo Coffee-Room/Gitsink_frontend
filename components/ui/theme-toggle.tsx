@@ -1,6 +1,6 @@
 "use client"
 
-import { useTheme } from "next-themes"
+import { useTheme } from "@/components/theme-provider"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun } from "lucide-react"
@@ -9,7 +9,7 @@ export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
-  // Use resolvedTheme instead of theme to get the actual applied theme
+  // Use resolvedTheme to get the actual applied theme
   const currentTheme = resolvedTheme || "light"
 
   // Avoid hydration mismatch by only rendering after mount

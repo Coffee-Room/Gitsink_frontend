@@ -3,26 +3,8 @@
 import { Github, Code, Zap } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { CoordinatedAnimation } from "@/components/animations/coordinated-animations"
-import { useLoading } from "@/contexts/loading-context"
-import { useEffect, useRef } from "react"
 
 export default function HowItWorks() {
-  const { setSectionLoaded } = useLoading()
-  const hasMarkedLoaded = useRef(false)
-
-  // Mark this section as loaded when it mounts, but only once
-  useEffect(() => {
-    // Use a timeout to ensure this runs after initial render
-    const timer = setTimeout(() => {
-      if (!hasMarkedLoaded.current) {
-        setSectionLoaded("how-it-works", true)
-        hasMarkedLoaded.current = true
-      }
-    }, 0)
-
-    return () => clearTimeout(timer)
-  }, [setSectionLoaded])
-
   return (
     <section id="how-it-works" className="py-12 md:py-20 bg-muted/50">
       <div className="container px-4 md:px-6">

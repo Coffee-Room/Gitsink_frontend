@@ -1,8 +1,7 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Space_Grotesk, DM_Sans } from "next/font/google"
-import { LoadingProvider } from "@/contexts/loading-context"
-import ClientLayout from "./client-layout"
+import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
 // Define the fonts with proper subsets and weights
@@ -39,9 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${spaceGrotesk.variable} ${dmSans.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
-        <LoadingProvider>
-          <ClientLayout>{children}</ClientLayout>
-        </LoadingProvider>
+        <ThemeProvider defaultTheme="system">{children}</ThemeProvider>
       </body>
     </html>
   )

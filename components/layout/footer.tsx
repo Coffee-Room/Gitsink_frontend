@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { Github } from "lucide-react"
+import { Github, Twitter } from "lucide-react"
 
 export default function Footer() {
   return (
@@ -24,13 +24,22 @@ export default function Footer() {
           <p className="text-center text-sm text-muted-foreground md:text-left">Made by developers for developers.</p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
-              href="https://github.com"
+              href="https://github.com/enochthedev"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-all duration-200 hover:scale-110"
             >
               <Github className="h-5 w-5" />
               <span className="sr-only">GitHub</span>
+            </Link>
+            <Link
+              href="https://twitter.com/wavedidwhat"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground transition-all duration-200 hover:scale-110"
+            >
+              <Twitter className="h-5 w-5" />
+              <span className="sr-only">Twitter</span>
             </Link>
             <Link
               href="/status"
@@ -51,6 +60,28 @@ export default function Footer() {
               Policies
             </Link>
           </div>
+        </div>
+        <div className="mt-6 flex justify-center border-t border-border pt-6">
+          <p className="text-center text-xs text-muted-foreground">
+            Created by{" "}
+            <Link
+              href="https://twitter.com/wavedidwhat"
+              className="font-medium hover:underline"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              @wave
+            </Link>{" "}
+            |
+            <Link
+              href="https://github.com/enochthedev"
+              className="font-medium hover:underline ml-1"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              enochthedev
+            </Link>
+          </p>
         </div>
       </div>
     </footer>

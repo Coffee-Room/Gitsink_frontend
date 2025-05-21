@@ -3,26 +3,8 @@
 import type React from "react"
 import { RefreshCw, Zap, Key } from "lucide-react"
 import { CoordinatedAnimation } from "@/components/animations/coordinated-animations"
-import { useLoading } from "@/contexts/loading-context"
-import { useEffect, useRef } from "react"
 
 export default function Features() {
-  const { setSectionLoaded } = useLoading()
-  const hasMarkedLoaded = useRef(false)
-
-  // Mark this section as loaded when it mounts, but only once
-  useEffect(() => {
-    // Use a timeout to ensure this runs after initial render
-    const timer = setTimeout(() => {
-      if (!hasMarkedLoaded.current) {
-        setSectionLoaded("features", true)
-        hasMarkedLoaded.current = true
-      }
-    }, 0)
-
-    return () => clearTimeout(timer)
-  }, [setSectionLoaded])
-
   return (
     <section id="features" className="py-12 md:py-20">
       <div className="container px-4 md:px-6">

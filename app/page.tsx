@@ -7,6 +7,7 @@ import ProjectShowcase from "@/components/sections/project-showcase"
 import StatsSection from "@/components/sections/stats-section"
 import Faq from "@/components/sections/faq"
 import Cta from "@/components/sections/cta"
+import Footer from "@/components/layout/footer"
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
         <Faq />
         <Cta />
       </main>
+      <Footer />
     </div>
   )
 }

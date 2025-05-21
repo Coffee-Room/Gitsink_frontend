@@ -6,7 +6,7 @@ const MAINTENANCE_MODE = process.env.MAINTENANCE_MODE === "true"
 const MAINTENANCE_TOKEN = process.env.MAINTENANCE_TOKEN || "gitsink-bypass-maintenance"
 
 // Paths that should bypass maintenance mode
-const BYPASS_PATHS = ["/api/health", "/api/status", "/_next", "/images", "/favicon.ico", "/maintenance"]
+const BYPASS_PATHS = ["/api/health", "/_next", "/images", "/favicon.ico", "/maintenance"]
 
 export function middleware(request: NextRequest) {
   // Get response to modify

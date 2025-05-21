@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { ApiBrowser } from "@/components/mockups/api-browser"
 import { useIsMobile } from "@/hooks/use-is-mobile"
 import { CoordinatedAnimation } from "@/components/animations/coordinated-animations"
-import { useLoading } from "@/contexts/loading-context"
 import Link from "next/link"
 
 const styles = {
@@ -16,7 +15,6 @@ const styles = {
 
 export default function Hero() {
   const isMobile = useIsMobile()
-  const { isHydrated } = useLoading()
 
   const jsonData = `{
   "projects": [
