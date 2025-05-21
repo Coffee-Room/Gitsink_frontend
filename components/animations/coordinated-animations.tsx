@@ -19,48 +19,52 @@ export function CoordinatedAnimation({
   threshold = 0.1,
   once = true,
 }: CoordinatedAnimationProps) {
+  // State for animation visibility
   const [isVisible, setIsVisible] = useState(false)
+
+  // State for client-side rendering check
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Refs
   const ref = useRef<HTMLDivElement>(null)
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
   const hasAnimated = useRef(false)
 
-  // In SSR, just render the children without animation
-  if (typeof window === "undefined") {
-    return <div className={className}>{children}</div>
-  }
+  // State for preferences
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
-  // Check for reduced motion preference
+  // Handle client-side mounting
   useEffect(() => {
+    setIsMounted(true)
+
+    // Check for reduced motion preference
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
     setPrefersReducedMotion(mediaQuery.matches)
 
-    const handleChange = () => {
+    // Check for mobile devices
+    setIsMobile(window.innerWidth < 768)
+
+    const handleMotionChange = () => {
       setPrefersReducedMotion(mediaQuery.matches)
     }
-
-    mediaQuery.addEventListener("change", handleChange)
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange)
-    }
-  }, [])
-
-  // Check for mobile devices
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768)
 
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768)
     }
 
+    mediaQuery.addEventListener("change", handleMotionChange)
     window.addEventListener("resize", handleResize)
+
     return () => {
+      mediaQuery.removeEventListener("change", handleMotionChange)
       window.removeEventListener("resize", handleResize)
     }
   }, [])
 
   // Set up intersection observer
   useEffect(() => {
+    if (!isMounted) return
+
     const element = ref.current
     if (!element) return
 
@@ -94,14 +98,12 @@ export function CoordinatedAnimation({
     observer.observe(element)
 
     return () => {
-      if (element) {
-        observer.unobserve(element)
-      }
+      observer.unobserve(element)
     }
-  }, [delay, threshold, once, isMobile])
+  }, [delay, threshold, once, isMobile, isMounted])
 
-  // If user prefers reduced motion, skip animations
-  if (prefersReducedMotion) {
+  // If not mounted yet or user prefers reduced motion, render without animation
+  if (!isMounted || prefersReducedMotion) {
     return <div className={className}>{children}</div>
   }
 
