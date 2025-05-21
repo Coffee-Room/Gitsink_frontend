@@ -1,35 +1,36 @@
 "use client"
 
-import { HelpCircle } from "lucide-react"
-import { CoordinatedAnimation } from "@/components/animations/coordinated-animations"
+import { useState, useEffect } from "react"
 
 export default function FaqHero() {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   return (
-    <section className="relative overflow-hidden py-16 sm:py-20 md:py-24 lg:py-28">
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-primary/5 to-background"></div>
-      <div className="absolute inset-0 bg-[url('/abstract-dots-pattern.png')] bg-repeat opacity-5"></div>
-      <div className="container px-4 md:px-6 relative z-10">
-        <div className="mx-auto max-w-3xl text-center">
-          <CoordinatedAnimation type="fade">
-            <div className="flex justify-center mb-6">
-              <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center shadow-lg">
-                <HelpCircle className="h-10 w-10 text-primary" />
-              </div>
-            </div>
-          </CoordinatedAnimation>
+    <section className="py-20 bg-gradient-to-b from-background to-muted/30">
+      <div className="container px-4 md:px-6 text-center">
+        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-6">Frequently Asked Questions</h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          Find answers to common questions about Gitsink and how it can help you showcase your projects.
+        </p>
 
-          <CoordinatedAnimation type="fade" delay={200}>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-bold tracking-tight">
-              Got Questions? We've Got Answers.
-            </h1>
-          </CoordinatedAnimation>
-
-          <CoordinatedAnimation delay={400} type="fade">
-            <p className="mt-6 text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to know about Gitsink in one place.
-            </p>
-          </CoordinatedAnimation>
-        </div>
+        {isMounted && (
+          <div className="mt-10 flex justify-center gap-4">
+            <a
+              href="#faq-list"
+              className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              onClick={(e) => {
+                e.preventDefault()
+                document.querySelector("#faq-list")?.scrollIntoView({ behavior: "smooth" })
+              }}
+            >
+              Browse Questions
+            </a>
+          </div>
+        )}
       </div>
     </section>
   )

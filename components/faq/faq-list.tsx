@@ -1,8 +1,31 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Card } from "@/components/ui/card"
-import { CoordinatedAnimation } from "@/components/animations/coordinated-animations"
+
+// Import the animation component conditionally
+const CoordinatedAnimation = ({ children, type, delay = 0 }) => {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return <>{children}</>
+  }
+
+  // Simple fade-in animation
+  const animationClass = type === "fade" ? "animate-fade-in" : "animate-slide-up"
+  const delayStyle = delay ? { animationDelay: `${delay}ms` } : {}
+
+  return (
+    <div className={animationClass} style={delayStyle}>
+      {children}
+    </div>
+  )
+}
 
 export default function FaqList() {
   const faqs = [
