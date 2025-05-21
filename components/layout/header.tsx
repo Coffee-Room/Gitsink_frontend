@@ -56,8 +56,8 @@ export default function Header() {
 
         <div className="flex items-center justify-end space-x-2">
           <ThemeToggle />
-          <Link href="/waitlist">
-            <Button className="hidden md:inline-flex bg-black hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 text-white transition-all duration-200 hover:scale-105">
+          <Link href="/waitlist" className="hidden md:inline-flex">
+            <Button className="bg-black hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 text-white transition-all duration-200 hover:scale-105">
               Join Waitlist
             </Button>
           </Link>
