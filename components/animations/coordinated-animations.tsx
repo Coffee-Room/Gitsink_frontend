@@ -1,99 +1,134 @@
 "use client"
 
-import { useEffect, useState, type ReactNode } from "react"
-import { useInView } from "react-intersection-observer"
-import { useReducedMotion } from "@/hooks/use-reduced-motion"
-
-type AnimationType = "fade" | "slide-up" | "slide-down" | "slide-left" | "slide-right" | "zoom" | "none"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 
 interface CoordinatedAnimationProps {
   children: ReactNode
-  type?: AnimationType
   delay?: number
-  duration?: number
+  type: "fade" | "slide-up" | "slide-down" | "slide-left" | "slide-right" | "zoom"
+  className?: string
   threshold?: number
   once?: boolean
-  className?: string
 }
 
 export function CoordinatedAnimation({
   children,
-  type = "fade",
   delay = 0,
-  duration = 500,
+  type = "fade",
+  className = "",
   threshold = 0.1,
   once = true,
-  className = "",
 }: CoordinatedAnimationProps) {
-  const prefersReducedMotion = useReducedMotion()
-  const [ref, inView] = useInView({
-    triggerOnce: once,
-    threshold,
-    // Skip if SSR
-    skip: typeof window === "undefined",
-  })
-  const [hasAnimated, setHasAnimated] = useState(false)
+  const [isVisible, setIsVisible] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const hasAnimated = useRef(false)
 
-  // Handle animation state
+  // In SSR, just render the children without animation
+  if (typeof window === "undefined") {
+    return <div className={className}>{children}</div>
+  }
+
+  // Check for reduced motion preference
   useEffect(() => {
-    if (inView && !hasAnimated) {
-      const timer = setTimeout(() => {
-        setHasAnimated(true)
-      }, delay)
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+    setPrefersReducedMotion(mediaQuery.matches)
 
-      return () => clearTimeout(timer)
+    const handleChange = () => {
+      setPrefersReducedMotion(mediaQuery.matches)
     }
-    return () => {}
-  }, [inView, delay, hasAnimated])
 
-  // If user prefers reduced motion, don't animate
+    mediaQuery.addEventListener("change", handleChange)
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange)
+    }
+  }, [])
+
+  // Check for mobile devices
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768)
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => {
+      window.removeEventListener("resize", handleResize)
+    }
+  }, [])
+
+  // Set up intersection observer
+  useEffect(() => {
+    const element = ref.current
+    if (!element) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        if (entry.isIntersecting) {
+          const timer = setTimeout(
+            () => {
+              setIsVisible(true)
+              hasAnimated.current = true
+            },
+            isMobile ? Math.min(delay, 200) : delay,
+          )
+
+          if (once) {
+            observer.unobserve(element)
+          }
+
+          return () => clearTimeout(timer)
+        } else if (!once) {
+          setIsVisible(false)
+        }
+      },
+      {
+        threshold,
+        rootMargin: "0px",
+      },
+    )
+
+    observer.observe(element)
+
+    return () => {
+      if (element) {
+        observer.unobserve(element)
+      }
+    }
+  }, [delay, threshold, once, isMobile])
+
+  // If user prefers reduced motion, skip animations
   if (prefersReducedMotion) {
     return <div className={className}>{children}</div>
   }
 
-  // Initial styles based on animation type
-  const getInitialStyles = (): string => {
-    if (typeof window === "undefined") return className // Return just the className for SSR
-
-    if (type === "none" || hasAnimated) return className
-
-    switch (type) {
-      case "fade":
-        return `opacity-0 ${className}`
-      case "slide-up":
-        return `opacity-0 translate-y-8 ${className}`
-      case "slide-down":
-        return `opacity-0 -translate-y-8 ${className}`
-      case "slide-left":
-        return `opacity-0 translate-x-8 ${className}`
-      case "slide-right":
-        return `opacity-0 -translate-x-8 ${className}`
-      case "zoom":
-        return `opacity-0 scale-95 ${className}`
-      default:
-        return className
+  const getAnimationStyles = () => {
+    if (!isVisible) {
+      switch (type) {
+        case "fade":
+          return "opacity-0"
+        case "slide-up":
+          return "opacity-0 translate-y-8"
+        case "slide-down":
+          return "opacity-0 -translate-y-8"
+        case "slide-left":
+          return "opacity-0 translate-x-8"
+        case "slide-right":
+          return "opacity-0 -translate-x-8"
+        case "zoom":
+          return "opacity-0 scale-95"
+        default:
+          return "opacity-0"
+      }
     }
-  }
-
-  // Animation styles
-  const getAnimationStyles = (): string => {
-    if (typeof window === "undefined") return "" // Return empty string for SSR
-
-    if (type === "none") return ""
-
-    const transitionDuration = `${duration}ms`
-    const transitionDelay = delay > 0 ? `${delay}ms` : ""
-
-    return `transition-all ease-out ${
-      transitionDuration ? `duration-${Math.floor(duration / 100)}00` : ""
-    } ${transitionDelay ? `delay-${Math.floor(delay / 100)}00` : ""}`
+    return "opacity-100 translate-x-0 translate-y-0 scale-100"
   }
 
   return (
-    <div
-      ref={ref}
-      className={`${getInitialStyles()} ${hasAnimated ? "opacity-100 translate-x-0 translate-y-0 scale-100" : ""} ${getAnimationStyles()}`}
-    >
+    <div ref={ref} className={`transition-all duration-700 ease-out ${getAnimationStyles()} ${className}`}>
       {children}
     </div>
   )
