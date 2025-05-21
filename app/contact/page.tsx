@@ -1,8 +1,10 @@
+"use client"
+
 import { Suspense } from "react"
 import dynamic from "next/dynamic"
 import Header from "@/components/layout/header"
 
-// Dynamically import client components with SSR disabled
+// Dynamically import client components
 const ContactHero = dynamic(() => import("@/components/contact/hero"), { ssr: false })
 const ContactForm = dynamic(() => import("@/components/contact/contact-form"), { ssr: false })
 const ContactInfo = dynamic(() => import("@/components/contact/contact-info"), { ssr: false })
