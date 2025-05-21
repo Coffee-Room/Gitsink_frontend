@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   description: "Documentation for the Gitsink API - Access synced GitHub data and integrate with your projects",
 }
 
-export default function ApiPage() {
+export default function ApiDocsPage() {
   return (
     <div className="container mx-auto max-w-6xl px-4 py-12">
       {/* Hero Section */}
