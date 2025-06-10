@@ -11,21 +11,19 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
+          token: ${{ secrets.PUBLIC_REPO_TOKEN }}
 
       - name: Remove private files
         run: |
           rm -f .env* vercel.json || true
       - name: Debug Token Permissions
-        env:
-          TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
         run: |
-          git ls-remote https://$TOKEN@github.com/Coffee-Room/gitsink_frontend.git
+          git ls-remote https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/Coffee-Room/gitsink_frontend.git
 
       - name: Push to public mirror
-        env:
-          TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
         run: |
           git config user.name "Wave Bot"
           git config user.email "bot@gitsink.tech"
-          git remote add public https://$TOKEN@github.com/Coffee-Room/gitsink_frontend.git
+          git remote add public https://${{ secrets.PUBLIC_REPO_TOKEN }}@github.com/Coffee-Room/gitsink_frontend.git
           git push --force public main:main
