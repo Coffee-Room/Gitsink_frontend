@@ -1,0 +1,31 @@
+name: "\U0001F4DA Docs CI"
+
+on:
+  push:
+    branches:
+      - 'docs/**'
+  pull_request:
+    branches: ['**']
+
+jobs:
+  docs:
+    if: github.repository == 'Coffee-Room/gitsink_frontend' && (startsWith(github.ref, 'refs/heads/docs/') || startsWith(github.head_ref, 'docs/'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check Markdown formatting
+        run: npx prettier --check "**/*.md"
+      - name: Build docs
+        run: pnpm docs:build --if-present
+      - name: "✅ Docs CI passed"
+        if: success()
+        run: echo "Docs pipeline succeeded"
+      - name: "❌ Docs CI failed"
+        if: failure()
+        run: echo "Docs pipeline failed"
