@@ -15,6 +15,11 @@ jobs:
       - name: Remove private files
         run: |
           rm -f .env* vercel.json || true
+      - name: Debug Token Permissions
+        env:
+          TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
+        run: |
+          git ls-remote https://$TOKEN@github.com/Coffee-Room/gitsink_frontend.git
 
       - name: Push to public mirror
         env:
