@@ -21,6 +21,6 @@ jobs:
           TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}
         run: |
           git config user.name "Wave Bot"
-          git config user.email "bot@gitsink.tech""
+          git config user.email "bot@gitsink.tech"
           git remote add public https://$TOKEN@github.com/Coffee-Room/gitsink_frontend.git
           git push --force public main:main
