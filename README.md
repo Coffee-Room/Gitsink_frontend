@@ -40,6 +40,16 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved. New issue
 - Wave – [@Enochthedev](https://github.com/Enochthedev)
 - The Coffee Room team
 
+## Syncing with the Public Repository
+
+The `dev` branch of this private repository stays aligned with
+[`Coffee-Room/gitsink_frontend`](https://github.com/Coffee-Room/gitsink_frontend).
+A workflow listens for a `repository_dispatch` event (`public-main-updated`) or
+runs hourly. When triggered, it merges the public `main` branch into `dev`,
+pushes the branch, and opens an automated pull request from `dev` to `main`.
+All sync operations use a single secret token, `PUBLIC_REPO_TOKEN`, which has the
+permissions needed to push to other repositories.
+
 ## License
 
 This project is licensed under the MIT License. See the [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community behavior guidelines.
