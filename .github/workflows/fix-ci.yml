@@ -1,0 +1,42 @@
+name: "\U0001F41E Fix CI"
+
+on:
+  push:
+    branches:
+      - 'fix/**'
+  pull_request:
+    branches: ['**']
+
+jobs:
+  fix:
+    if: github.repository == 'Coffee-Room/gitsink_frontend' && (startsWith(github.ref, 'refs/heads/fix/') || startsWith(github.head_ref, 'fix/'))
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      - name: Run ESLint
+        run: pnpm lint
+        
+      - name: Run tests
+        run: pnpm test --if-present
+        
+      - name: "✅ Fix CI passed"
+        if: success()
+        run: echo "Fix pipeline succeeded"
+        
+      - name: "❌ Fix CI failed"
+        if: failure()
+        run: echo "Fix pipeline failed"
