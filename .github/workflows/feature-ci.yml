@@ -1,0 +1,33 @@
+name: "\U0001F527 Feature CI"
+
+on:
+  push:
+    branches:
+      - 'features/**'
+  pull_request:
+    branches: ['**']
+
+jobs:
+  feature:
+    if: github.repository == 'Coffee-Room/gitsink_frontend' && (startsWith(github.ref, 'refs/heads/features/') || startsWith(github.head_ref, 'features/'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run ESLint
+        run: pnpm lint
+      - name: Run Jest tests
+        run: pnpm test --if-present
+      - name: Build app
+        run: pnpm build
+      - name: "✅ Feature CI passed"
+        if: success()
+        run: echo "Feature pipeline succeeded"
+      - name: "❌ Feature CI failed"
+        if: failure()
+        run: echo "Feature pipeline failed"
