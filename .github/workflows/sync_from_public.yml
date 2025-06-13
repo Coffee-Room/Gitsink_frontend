@@ -1,0 +1,52 @@
+name: Sync from Public Main to Dev and PR to Main
+
+on:
+  repository_dispatch:
+    types: [public-main-updated]
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    if: github.repository == 'Enochthedev/Gitsink'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout current repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PUBLIC_REPO_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "Wave Bot"
+          git config user.email "bot@gitsink.tech"
+
+      - name: Add public remote
+        run: |
+          git remote add public https://github.com/Coffee-Room/gitsink_frontend.git || \
+          git remote set-url public https://github.com/Coffee-Room/gitsink_frontend.git
+
+      - name: Fetch public main
+        run: git fetch public main
+
+      - name: Checkout or create dev
+        run: git checkout dev || git checkout -b dev
+
+      - name: Merge public main into dev
+        run: git merge public/main --no-edit
+
+      - name: Push dev branch
+        run: git push origin dev
+
+      - name: Create PR from dev to main
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: dev
+          destination_branch: main
+          pr_title: "🔄 Auto PR: Sync public/main → dev → main"
+          pr_body: "This PR was auto-generated after syncing with the public repo."
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUBLIC_REPO_TOKEN }}

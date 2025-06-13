@@ -17,6 +17,10 @@ jobs:
         with:
           node-version: 18
           cache: 'pnpm'
+
+      # Install pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Run ESLint
