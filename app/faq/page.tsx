@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Header from "@/components/layout/header";
 
 export default function FaqPage() {
   // Static FAQ data
@@ -58,8 +59,8 @@ export default function FaqPage() {
   return (
     <div className="flex min-h-screen flex-col">
       {/* Simple Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
+      <header className="w-full fixed top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <span className="font-bold">Gitsink</span>
           </Link>
@@ -126,7 +127,10 @@ export default function FaqPage() {
             <div className="max-w-4xl mx-auto p-6 md:p-8 bg-card rounded-lg shadow-lg">
               <div className="space-y-6">
                 {faqs.map((faq, index) => (
-                  <div key={index} className="border-b pb-6 last:border-0 last:pb-0">
+                  <div
+                    key={index}
+                    className="border-b pb-6 last:border-0 last:pb-0"
+                  >
                     <h3 className="text-lg font-medium mb-2">{faq.question}</h3>
                     <p className="text-muted-foreground">{faq.answer}</p>
                   </div>
@@ -141,7 +145,10 @@ export default function FaqPage() {
                   Contact us
                 </Link>{" "}
                 or email{" "}
-                <a href="mailto:support@gitsink.tech" className="text-primary hover:underline">
+                <a
+                  href="mailto:support@gitsink.tech"
+                  className="text-primary hover:underline"
+                >
                   support@gitsink.tech
                 </a>{" "}
                 for help.
@@ -154,9 +161,12 @@ export default function FaqPage() {
         <section className="py-12 md:py-20">
           <div className="container px-4 md:px-6">
             <div className="mx-auto max-w-3xl rounded-lg bg-primary/5 p-6 md:p-8 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight sm:text-4xl">Still have questions?</h2>
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight sm:text-4xl">
+                Still have questions?
+              </h2>
               <p className="mt-4 text-base md:text-lg text-muted-foreground">
-                Contact our support team for more information or join our waitlist to stay updated.
+                Contact our support team for more information or join our
+                waitlist to stay updated.
               </p>
               <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
@@ -214,18 +224,27 @@ export default function FaqPage() {
             © 2023 Gitsink. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            <Link href="/privacy" className="text-sm text-muted-foreground hover:underline">
+            <Link
+              href="/privacy"
+              className="text-sm text-muted-foreground hover:underline"
+            >
               Privacy
             </Link>
-            <Link href="/terms" className="text-sm text-muted-foreground hover:underline">
+            <Link
+              href="/terms"
+              className="text-sm text-muted-foreground hover:underline"
+            >
               Terms
             </Link>
-            <Link href="/contact" className="text-sm text-muted-foreground hover:underline">
+            <Link
+              href="/contact"
+              className="text-sm text-muted-foreground hover:underline"
+            >
               Contact
             </Link>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }
