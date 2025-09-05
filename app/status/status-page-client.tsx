@@ -1,360 +1,276 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import type React from "react"
+
+import { useState } from "react"
 import Link from "next/link"
+import { ArrowLeft, RefreshCw, CheckCircle, AlertTriangle, XCircle, Mail, Rss } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, RefreshCw, CheckCircle, AlertCircle, XCircle, Clock, Bell, ExternalLink } from "lucide-react"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
-
-interface ServiceStatus {
-  name: string
-  status: "operational" | "degraded" | "outage"
-  uptime: string
-  responseTime: string
-}
-
-interface Incident {
-  id: string
-  title: string
-  status: "investigating" | "identified" | "monitoring" | "resolved"
-  severity: "minor" | "major" | "critical"
-  createdAt: string
-  updatedAt: string
-  description: string
-}
-
-const services: ServiceStatus[] = [
-  { name: "API Gateway", status: "operational", uptime: "99.99%", responseTime: "45ms" },
-  { name: "GitHub Integration", status: "operational", uptime: "99.95%", responseTime: "120ms" },
-  { name: "Database", status: "operational", uptime: "99.98%", responseTime: "12ms" },
-  { name: "Authentication", status: "operational", uptime: "99.97%", responseTime: "35ms" },
-  { name: "Webhook Delivery", status: "degraded", uptime: "98.50%", responseTime: "250ms" },
-  { name: "Dashboard", status: "operational", uptime: "99.99%", responseTime: "80ms" },
-]
-
-const incidents: Incident[] = [
-  {
-    id: "1",
-    title: "Webhook delivery delays",
-    status: "monitoring",
-    severity: "minor",
-    createdAt: "2024-01-15T10:30:00Z",
-    updatedAt: "2024-01-15T11:45:00Z",
-    description: "We are experiencing delays in webhook delivery. Our team is monitoring the situation.",
-  },
-  {
-    id: "2",
-    title: "API rate limiting issues",
-    status: "resolved",
-    severity: "major",
-    createdAt: "2024-01-14T14:20:00Z",
-    updatedAt: "2024-01-14T16:30:00Z",
-    description: "Rate limiting was incorrectly applied to some API endpoints. This has been resolved.",
-  },
-]
-
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case "operational":
-      return <CheckCircle className="h-4 w-4 text-green-500" />
-    case "degraded":
-      return <AlertCircle className="h-4 w-4 text-yellow-500" />
-    case "outage":
-      return <XCircle className="h-4 w-4 text-red-500" />
-    default:
-      return <Clock className="h-4 w-4 text-gray-500" />
-  }
-}
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "operational":
-      return "bg-green-500"
-    case "degraded":
-      return "bg-yellow-500"
-    case "outage":
-      return "bg-red-500"
-    default:
-      return "bg-gray-500"
-  }
-}
-
-const getIncidentStatusColor = (status: string) => {
-  switch (status) {
-    case "investigating":
-      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-    case "identified":
-      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-    case "monitoring":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-    case "resolved":
-      return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-    default:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
-  }
-}
-
-const getSeverityColor = (severity: string) => {
-  switch (severity) {
-    case "critical":
-      return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-    case "major":
-      return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
-    case "minor":
-      return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-    default:
-      return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
-  }
-}
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZoneName: "short",
-  })
-}
+import { Input } from "@/components/ui/input"
 
 export default function StatusPageClient() {
-  const [lastUpdated, setLastUpdated] = useState<string>("")
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [email, setEmail] = useState("")
 
-  useEffect(() => {
-    setLastUpdated(new Date().toLocaleString())
-  }, [])
-
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     setIsRefreshing(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setLastUpdated(new Date().toLocaleString())
-    setIsRefreshing(false)
+    setTimeout(() => setIsRefreshing(false), 2000)
   }
 
-  const overallStatus = services.every((service) => service.status === "operational")
-    ? "operational"
-    : services.some((service) => service.status === "outage")
-      ? "outage"
-      : "degraded"
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Handle subscription logic here
+    console.log("Subscribing email:", email)
+    setEmail("")
+  }
+
+  const services = [
+    { name: "API Gateway", status: "operational", uptime: "99.99%" },
+    { name: "Database", status: "operational", uptime: "99.98%" },
+    { name: "Authentication", status: "operational", uptime: "99.97%" },
+    { name: "File Storage", status: "degraded", uptime: "99.85%" },
+    { name: "Webhooks", status: "operational", uptime: "99.96%" },
+    { name: "Analytics", status: "operational", uptime: "99.94%" },
+  ]
+
+  const metrics = [
+    { label: "Uptime", value: "99.97%", change: "+0.02%" },
+    { label: "Response Time", value: "145ms", change: "-12ms" },
+    { label: "API Requests", value: "2.4M", change: "+15%" },
+  ]
+
+  const incidents = [
+    {
+      id: 1,
+      title: "Intermittent API Timeouts",
+      status: "resolved",
+      severity: "minor",
+      date: "2024-01-15",
+      time: "14:30 UTC",
+    },
+    {
+      id: 2,
+      title: "Database Connection Issues",
+      status: "investigating",
+      severity: "major",
+      date: "2024-01-14",
+      time: "09:15 UTC",
+    },
+    {
+      id: 3,
+      title: "Scheduled Maintenance",
+      status: "completed",
+      severity: "maintenance",
+      date: "2024-01-12",
+      time: "02:00 UTC",
+    },
+  ]
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "operational":
+        return <CheckCircle className="h-4 w-4 text-green-500" />
+      case "degraded":
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />
+      case "outage":
+        return <XCircle className="h-4 w-4 text-red-500" />
+      default:
+        return <CheckCircle className="h-4 w-4 text-green-500" />
+    }
+  }
+
+  const getStatusBadge = (status: string) => {
+    const variants = {
+      operational: "bg-green-100 text-green-800 border-green-200",
+      degraded: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      outage: "bg-red-100 text-red-800 border-red-200",
+      resolved: "bg-green-100 text-green-800 border-green-200",
+      investigating: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      completed: "bg-blue-100 text-blue-800 border-blue-200",
+    }
+
+    return <Badge className={`${variants[status as keyof typeof variants]} capitalize`}>{status}</Badge>
+  }
+
+  const getSeverityBadge = (severity: string) => {
+    const variants = {
+      minor: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      major: "bg-red-100 text-red-800 border-red-200",
+      maintenance: "bg-blue-100 text-blue-800 border-blue-200",
+    }
+
+    return <Badge className={`${variants[severity as keyof typeof variants]} capitalize`}>{severity}</Badge>
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-
-      <main className="container mx-auto px-4 md:px-6 py-8">
-        {/* Navigation Back */}
-        <div className="mb-6 animate-fade-in-up">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      {/* Navigation */}
+      <div className="border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4">
           <Link
             href="/"
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors animate-fade-in-up"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-4 w-4" />
             Back to Gitsink
           </Link>
         </div>
+      </div>
 
+      <div className="container mx-auto px-4 py-8 space-y-8">
         {/* Hero Section */}
-        <div className="text-center mb-12 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className={`w-3 h-3 rounded-full ${getStatusColor(overallStatus)}`} />
-            <Badge variant={overallStatus === "operational" ? "default" : "destructive"}>
-              {overallStatus === "operational"
-                ? "All Systems Operational"
-                : overallStatus === "degraded"
-                  ? "Some Systems Degraded"
-                  : "System Outage"}
-            </Badge>
+        <div className="text-center space-y-4 animate-fade-in-up">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-800 text-sm font-medium border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
+            <CheckCircle className="h-4 w-4" />
+            All Systems Operational
           </div>
-
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Gitsink System Status</h1>
-
-          <p className="text-xl text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Current operational status and uptime information for all Gitsink services
+          <h1 className="text-4xl font-bold text-slate-900 dark:text-slate-100">Gitsink Status</h1>
+          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            Real-time status and uptime monitoring for all Gitsink services
           </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex justify-center gap-4">
             <Button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              variant="outline"
-              className="hover:scale-105 transition-transform bg-transparent"
+              className="animate-fade-in-up"
+              style={{ animationDelay: "0.1s" }}
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
               {isRefreshing ? "Refreshing..." : "Refresh Status"}
             </Button>
-
-            <Button variant="outline" className="hover:scale-105 transition-transform bg-transparent">
-              <Bell className="h-4 w-4 mr-2" />
-              Subscribe to Updates
-            </Button>
-          </div>
-
-          {lastUpdated && <p className="text-sm text-muted-foreground mt-4">Last updated: {lastUpdated}</p>}
-        </div>
-
-        {/* Current Status */}
-        <div className="mb-12 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-          <h2 className="text-2xl font-semibold mb-6">Current Status</h2>
-
-          <div className="grid gap-4">
-            {services.map((service, index) => (
-              <Card
-                key={service.name}
-                className="hover:shadow-md transition-all duration-200 animate-fade-in-up"
-                style={{ animationDelay: `${0.3 + index * 0.1}s` }}
-              >
-                <CardContent className="flex items-center justify-between p-6">
-                  <div className="flex items-center gap-3">
-                    {getStatusIcon(service.status)}
-                    <div>
-                      <h3 className="font-medium">{service.name}</h3>
-                      <p className="text-sm text-muted-foreground capitalize">
-                        {service.status === "operational"
-                          ? "Operational"
-                          : service.status === "degraded"
-                            ? "Degraded Performance"
-                            : "Outage"}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="text-sm font-medium">{service.uptime} uptime</div>
-                    <div className="text-sm text-muted-foreground">{service.responseTime} avg response</div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
           </div>
         </div>
 
         {/* System Metrics */}
-        <div className="mb-12 animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
-          <h2 className="text-2xl font-semibold mb-6">System Metrics</h2>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Overall Uptime</CardTitle>
-                <CardDescription>Last 30 days</CardDescription>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {metrics.map((metric, index) => (
+            <Card
+              key={metric.label}
+              className="animate-fade-in-up hover:shadow-lg transition-all duration-300"
+              style={{ animationDelay: `${0.2 + index * 0.1}s` }}
+            >
+              <CardHeader className="pb-2">
+                <CardDescription>{metric.label}</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-green-600">99.95%</div>
-                <p className="text-sm text-muted-foreground mt-1">43.2 minutes downtime</p>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Average Response Time</CardTitle>
-                <CardDescription>Last 24 hours</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">89ms</div>
-                <p className="text-sm text-muted-foreground mt-1">12ms faster than yesterday</p>
-              </CardContent>
-            </Card>
-
-            <Card className="hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">API Requests</CardTitle>
-                <CardDescription>Last 24 hours</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">2.4M</div>
-                <p className="text-sm text-muted-foreground mt-1">99.99% success rate</p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Recent Incidents */}
-        <div className="mb-12 animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
-          <h2 className="text-2xl font-semibold mb-6">Recent Incidents</h2>
-
-          {incidents.length > 0 ? (
-            <div className="space-y-4">
-              {incidents.map((incident, index) => (
-                <Card
-                  key={incident.id}
-                  className="hover:shadow-md transition-all duration-200 animate-fade-in-up"
-                  style={{ animationDelay: `${0.6 + index * 0.1}s` }}
+                <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">{metric.value}</div>
+                <p
+                  className={`text-sm ${
+                    metric.change.startsWith("+") && metric.label !== "API Requests"
+                      ? "text-green-600"
+                      : metric.change.startsWith("-") && metric.label === "Response Time"
+                        ? "text-green-600"
+                        : metric.change.startsWith("+") && metric.label === "API Requests"
+                          ? "text-green-600"
+                          : "text-red-600"
+                  }`}
                 >
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <CardTitle className="text-lg">{incident.title}</CardTitle>
-                        <div className="flex gap-2">
-                          <Badge className={getIncidentStatusColor(incident.status)}>
-                            {incident.status.charAt(0).toUpperCase() + incident.status.slice(1)}
-                          </Badge>
-                          <Badge className={getSeverityColor(incident.severity)}>
-                            {incident.severity.charAt(0).toUpperCase() + incident.severity.slice(1)}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="text-right text-sm text-muted-foreground">
-                        <div>Created: {formatDate(incident.createdAt)}</div>
-                        <div>Updated: {formatDate(incident.updatedAt)}</div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{incident.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <Card>
-              <CardContent className="text-center py-12">
-                <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">No Recent Incidents</h3>
-                <p className="text-muted-foreground">
-                  All systems have been running smoothly. No incidents to report in the last 7 days.
+                  {metric.change} from last week
                 </p>
               </CardContent>
             </Card>
-          )}
+          ))}
         </div>
 
-        {/* Subscribe Section */}
-        <div className="text-center animate-fade-in-up" style={{ animationDelay: "0.6s" }}>
-          <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle>Stay Updated</CardTitle>
-              <CardDescription>Get notified about system status changes and scheduled maintenance</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button className="flex-1 hover:scale-105 transition-transform">
-                  <Bell className="h-4 w-4 mr-2" />
-                  Subscribe to Email Updates
+        {/* Service Status */}
+        <Card className="animate-fade-in-up" style={{ animationDelay: "0.5s" }}>
+          <CardHeader>
+            <CardTitle>Service Status</CardTitle>
+            <CardDescription>Current operational status of all Gitsink services</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {services.map((service, index) => (
+                <div
+                  key={service.name}
+                  className="flex items-center justify-between p-4 rounded-lg border bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors animate-fade-in-up"
+                  style={{ animationDelay: `${0.6 + index * 0.1}s` }}
+                >
+                  <div className="flex items-center gap-3">
+                    {getStatusIcon(service.status)}
+                    <div>
+                      <h3 className="font-medium text-slate-900 dark:text-slate-100">{service.name}</h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">{service.uptime} uptime</p>
+                    </div>
+                  </div>
+                  {getStatusBadge(service.status)}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent Incidents */}
+        <Card className="animate-fade-in-up" style={{ animationDelay: "0.8s" }}>
+          <CardHeader>
+            <CardTitle>Recent Incidents</CardTitle>
+            <CardDescription>Latest incidents and maintenance activities</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {incidents.map((incident, index) => (
+                <div
+                  key={incident.id}
+                  className="p-4 rounded-lg border bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors animate-fade-in-up"
+                  style={{ animationDelay: `${0.9 + index * 0.1}s` }}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <h3 className="font-medium text-slate-900 dark:text-slate-100 mb-2">{incident.title}</h3>
+                      <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                        <span>{incident.date}</span>
+                        <span>•</span>
+                        <span>{incident.time}</span>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      {getSeverityBadge(incident.severity)}
+                      {getStatusBadge(incident.status)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Subscribe to Updates */}
+        <Card className="animate-fade-in-up" style={{ animationDelay: "1.2s" }}>
+          <CardHeader>
+            <CardTitle>Subscribe to Updates</CardTitle>
+            <CardDescription>Get notified about service status changes and maintenance windows</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <form onSubmit={handleSubscribe} className="flex gap-2">
+                <Input
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="flex-1"
+                  required
+                />
+                <Button type="submit">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Subscribe
                 </Button>
-                <Button variant="outline" className="flex-1 hover:scale-105 transition-transform bg-transparent">
-                  <ExternalLink className="h-4 w-4 mr-2" />
+              </form>
+              <div className="flex items-center gap-4 pt-2">
+                <Button variant="outline" size="sm">
+                  <Rss className="h-4 w-4 mr-2" />
                   RSS Feed
                 </Button>
+                <span className="text-sm text-slate-600 dark:text-slate-400">
+                  Or subscribe via RSS for real-time updates
+                </span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                You can also follow us on{" "}
-                <Link href="#" className="text-primary hover:underline">
-                  Twitter
-                </Link>{" "}
-                for real-time updates.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-
-      <Footer />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

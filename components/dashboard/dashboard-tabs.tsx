@@ -6,7 +6,7 @@ interface DashboardTabsProps {
   defaultValue: string
 }
 
-export function DashboardTabs({ defaultValue }: DashboardTabsProps) {
+export default function DashboardTabs({ defaultValue }: DashboardTabsProps) {
   return (
     <Tabs defaultValue={defaultValue} className="w-full">
       <TabsList className="grid w-full grid-cols-3 md:w-auto">
