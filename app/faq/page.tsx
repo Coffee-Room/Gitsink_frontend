@@ -1,231 +1,268 @@
+import type { Metadata } from "next"
+import Header from "@/components/layout/header"
+import Footer from "@/components/layout/footer"
 import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { ArrowRight, HelpCircle, MessageCircle, Mail } from "lucide-react"
 
-export default function FaqPage() {
-  // Static FAQ data
-  const faqs = [
+export const metadata: Metadata = {
+  title: "FAQ - Gitsink",
+  description: "Find answers to frequently asked questions about Gitsink and how to get the most out of our platform.",
+}
+
+export default function FAQPage() {
+  const faqCategories = [
     {
-      question: "What is Gitsink?",
-      answer:
-        "Gitsink is a tool that transforms your GitHub projects into a powerful API, perfect for showcasing your work across multiple platforms. It automatically syncs with your repositories and provides structured data that you can use on websites, applications, bots, and more.",
+      title: "Getting Started",
+      faqs: [
+        {
+          question: "What is Gitsink?",
+          answer:
+            "Gitsink is a platform that transforms your GitHub repositories into a powerful API. It allows you to showcase your projects across websites, bots, mobile apps, and other platforms with rich metadata and real-time synchronization.",
+        },
+        {
+          question: "How do I get started with Gitsink?",
+          answer:
+            "Getting started is simple! Sign up for an account, connect your GitHub profile with one-click authentication, generate your API key, and start making requests to showcase your projects anywhere.",
+        },
+        {
+          question: "Is Gitsink free to use?",
+          answer:
+            "Yes! Gitsink offers a generous free tier that includes access to public repositories, basic API calls, and core features. We also offer premium plans for advanced features and higher usage limits.",
+        },
+        {
+          question: "Do I need to be a developer to use Gitsink?",
+          answer:
+            "While Gitsink is designed with developers in mind, you don't need extensive programming knowledge to get started. Our documentation includes simple examples and copy-paste code snippets for common use cases.",
+        },
+      ],
     },
     {
-      question: "How do I use Gitsink?",
-      answer:
-        "Using Gitsink is simple: 1) Log in with GitHub to authenticate securely, 2) Add a Portfolio.md file to your repositories to provide context and additional details, 3) Access your projects via our API using either GraphQL or REST endpoints. That's it! Your projects are now available wherever you need them.",
+      title: "API & Integration",
+      faqs: [
+        {
+          question: "What types of APIs does Gitsink provide?",
+          answer:
+            "Gitsink offers both REST and GraphQL APIs. Use REST for simple queries and quick integration, or GraphQL for more complex data fetching with precise control over the response structure.",
+        },
+        {
+          question: "How do I authenticate API requests?",
+          answer:
+            "Authentication is done using API keys. Include your API key in the Authorization header as a Bearer token. You can generate and manage your API keys from your dashboard.",
+        },
+        {
+          question: "What data can I access through the API?",
+          answer:
+            "You can access repository information, project metadata, commit history, technologies used, demo links, and any custom data you've added through Portfolio.md files in your repositories.",
+        },
+        {
+          question: "Are there rate limits on API calls?",
+          answer:
+            "Yes, we implement fair usage rate limits to ensure service quality for all users. Free accounts have standard limits, while premium accounts enjoy higher limits. Check your dashboard for current usage.",
+        },
+      ],
     },
     {
-      question: "What platforms can I showcase my projects on?",
-      answer:
-        "Gitsink works with virtually any platform that can consume an API. This includes websites, bots (like Telegram), plugins, social profiles (Twitter, Twitch, Discord), and any other platform that can make API requests. The flexibility of our API means you can showcase your work anywhere you want.",
+      title: "Features & Functionality",
+      faqs: [
+        {
+          question: "How does repository synchronization work?",
+          answer:
+            "Gitsink automatically syncs with your GitHub repositories in real-time. When you push changes, update README files, or modify Portfolio.md files, the changes are reflected in your API responses within minutes.",
+        },
+        {
+          question: "Can I customize how my projects are displayed?",
+          answer:
+            "Create a Portfolio.md file in your repository root to add custom descriptions, technology stacks, demo links, screenshots, and categorization. This metadata enhances your API responses.",
+        },
+        {
+          question: "Does Gitsink work with private repositories?",
+          answer:
+            "Yes, Gitsink supports both public and private repositories. You control which repositories are included in your API responses and can manage access permissions through your dashboard.",
+        },
+        {
+          question: "Can I use Gitsink for team projects?",
+          answer:
+            "Currently, Gitsink focuses on individual developer portfolios. However, you can showcase collaborative projects from your personal GitHub account, and we're exploring team features for future releases.",
+        },
+      ],
     },
     {
-      question: "Is Gitsink free?",
-      answer:
-        "Yes, Gitsink is free for early users who join the waitlist. We're committed to providing a generous free tier even after our official launch, ensuring that developers can showcase their work without barriers.",
-    },
-    {
-      question: "How is my data secured?",
-      answer:
-        "Your data is protected with secure API keys that you control. We only request read access to your repositories, and you can specify exactly which projects are accessible through the API. Your API key is unique to you and can be regenerated at any time for security purposes.",
-    },
-    {
-      question: "Can I use Gitsink for commercial projects?",
-      answer:
-        "Absolutely. Gitsink is built for all developers, whether you're working on personal or commercial projects. You can use it to showcase client work, company projects, or anything else you've built.",
-    },
-    {
-      question: "Is there a limit to how many projects I can showcase?",
-      answer:
-        "No, you can sync all your public GitHub projects. For private repositories, you can choose which ones to make visible through the API without exposing the actual code. This gives you complete control over what you showcase.",
-    },
-    {
-      question: "Do I need coding skills to use Gitsink?",
-      answer:
-        "A basic understanding of APIs is helpful, but we make it easy to get started. Our documentation includes examples for both GraphQL and REST, and we provide code snippets for common use cases. If you can write a simple Portfolio.md file, you can use Gitsink effectively.",
-    },
-    {
-      question: "What information can I include in my Portfolio.md file?",
-      answer:
-        "Your Portfolio.md file can include custom metadata beyond what GitHub provides, such as project categories, featured status, demo links, technologies used, screenshots, documentation links, and any custom fields you want to add. This allows you to provide rich context for your projects.",
-    },
-    {
-      question: "How often does Gitsink sync with my GitHub repositories?",
-      answer:
-        "Gitsink automatically syncs with your GitHub repositories whenever changes are detected. This ensures that your project showcase is always up-to-date with the latest information without any manual intervention.",
+      title: "Technical Support",
+      faqs: [
+        {
+          question: "What if I encounter an API error?",
+          answer:
+            "Check our status page first to see if there are any ongoing issues. Most errors are related to authentication or rate limits. Our documentation includes common error codes and solutions.",
+        },
+        {
+          question: "How can I report a bug or request a feature?",
+          answer:
+            "We'd love to hear from you! Use our contact form, email us directly, or reach out through our community channels. We actively review all feedback and prioritize improvements based on user needs.",
+        },
+        {
+          question: "Is there a community or support forum?",
+          answer:
+            "Yes! Join our Discord community to connect with other developers, share use cases, get help, and stay updated on new features. We also maintain comprehensive documentation and tutorials.",
+        },
+        {
+          question: "What's your uptime guarantee?",
+          answer:
+            "We maintain 99.9% uptime with global CDN distribution and redundant infrastructure. Our status page provides real-time monitoring, and we proactively communicate any maintenance or issues.",
+        },
+      ],
     },
   ]
 
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Simple Header */}
-      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="font-bold">Gitsink</span>
-          </Link>
-          <nav className="ml-auto flex gap-4">
-            <Link href="/" className="text-sm font-medium">
-              Home
-            </Link>
-            <Link href="/features" className="text-sm font-medium">
-              Features
-            </Link>
-            <Link href="/how-it-works" className="text-sm font-medium">
-              How It Works
-            </Link>
-            <Link href="/faq" className="text-sm font-medium">
-              FAQ
-            </Link>
-            <Link href="/contact" className="text-sm font-medium">
-              Contact
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
-      <main className="flex-1 relative">
+      <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-16 sm:py-20">
-          <div className="container px-4 md:px-6">
-            <div className="mx-auto max-w-3xl text-center">
-              <div className="mb-6 flex justify-center">
-                <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-10 w-10 text-primary"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-                    <path d="M12 17h.01" />
-                  </svg>
-                </div>
-              </div>
+        <section className="py-20 bg-gradient-to-b from-background to-muted/30">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="mx-auto max-w-3xl text-center animate-fade-in-up">
+              <Badge variant="secondary" className="mb-4">
+                <HelpCircle className="h-4 w-4 mr-2" />
+                FAQ
+              </Badge>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight">
-                Got Questions? We've Got Answers.
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-6">
+                Frequently Asked Questions
               </h1>
 
-              <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-                Everything you need to know about Gitsink in one place.
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+                Find answers to common questions about Gitsink. Can't find what you're looking for? We're here to help!
               </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" asChild className="group">
+                  <Link href="/contact">
+                    Contact Support
+                    <MessageCircle className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link href="/developer">View Documentation</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* FAQ List Section */}
-        <section className="py-12 md:py-16" id="faq-list">
-          <div className="container px-4 md:px-6">
-            <div className="max-w-4xl mx-auto p-6 md:p-8 bg-card rounded-lg shadow-lg">
-              <div className="space-y-6">
-                {faqs.map((faq, index) => (
-                  <div key={index} className="border-b pb-6 last:border-0 last:pb-0">
-                    <h3 className="text-lg font-medium mb-2">{faq.question}</h3>
-                    <p className="text-muted-foreground">{faq.answer}</p>
-                  </div>
-                ))}
-              </div>
+        {/* FAQ Content */}
+        <section className="py-20">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="max-w-4xl mx-auto">
+              {faqCategories.map((category, categoryIndex) => (
+                <div
+                  key={categoryIndex}
+                  className="mb-12 animate-fade-in-up"
+                  style={{ animationDelay: `${categoryIndex * 0.1}s` }}
+                >
+                  <h2 className="text-2xl font-bold mb-6 text-center">{category.title}</h2>
+                  <Card className="hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-0">
+                      <Accordion type="single" collapsible className="w-full">
+                        {category.faqs.map((faq, faqIndex) => (
+                          <AccordionItem key={faqIndex} value={`item-${categoryIndex}-${faqIndex}`} className="px-6">
+                            <AccordionTrigger className="text-left hover:no-underline">
+                              <span className="font-medium">{faq.question}</span>
+                            </AccordionTrigger>
+                            <AccordionContent className="text-muted-foreground pb-4">{faq.answer}</AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                    </CardContent>
+                  </Card>
+                </div>
+              ))}
             </div>
+          </div>
+        </section>
 
-            <div className="mt-8 text-center text-muted-foreground">
-              <p>
-                Don't see your question here?{" "}
-                <Link href="/contact" className="text-primary hover:underline">
-                  Contact us
-                </Link>{" "}
-                or email{" "}
-                <a href="mailto:support@gitsink.tech" className="text-primary hover:underline">
-                  support@gitsink.tech
-                </a>{" "}
-                for help.
+        {/* Contact Section */}
+        <section className="py-20 bg-muted/30">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="max-w-3xl mx-auto text-center animate-fade-in-up">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Still Have Questions?</h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                Our support team is here to help you get the most out of Gitsink. Reach out anytime!
               </p>
+
+              <div className="grid gap-6 md:grid-cols-3">
+                <Card className="hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                  <CardHeader className="text-center">
+                    <MessageCircle className="h-8 w-8 text-primary mx-auto mb-2" />
+                    <CardTitle className="text-lg">Live Chat</CardTitle>
+                    <CardDescription>Get instant help from our support team</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <Button asChild className="w-full">
+                      <Link href="/contact">Start Chat</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                  <CardHeader className="text-center">
+                    <Mail className="h-8 w-8 text-primary mx-auto mb-2" />
+                    <CardTitle className="text-lg">Email Support</CardTitle>
+                    <CardDescription>Send us a detailed message</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <Button variant="outline" asChild className="w-full bg-transparent">
+                      <Link href="mailto:support@gitsink.tech">Send Email</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card className="hover:shadow-md hover:-translate-y-1 transition-all duration-300">
+                  <CardHeader className="text-center">
+                    <HelpCircle className="h-8 w-8 text-primary mx-auto mb-2" />
+                    <CardTitle className="text-lg">Documentation</CardTitle>
+                    <CardDescription>Explore our comprehensive guides</CardDescription>
+                  </CardHeader>
+                  <CardContent className="text-center">
+                    <Button variant="outline" asChild className="w-full bg-transparent">
+                      <Link href="/developer">View Docs</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </section>
 
         {/* CTA Section */}
-        <section className="py-12 md:py-20">
-          <div className="container px-4 md:px-6">
-            <div className="mx-auto max-w-3xl rounded-lg bg-primary/5 p-6 md:p-8 text-center">
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight sm:text-4xl">Still have questions?</h2>
-              <p className="mt-4 text-base md:text-lg text-muted-foreground">
-                Contact our support team for more information or join our waitlist to stay updated.
+        <section className="py-20 bg-primary/5">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="mx-auto max-w-3xl text-center animate-fade-in-up">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">Ready to Get Started?</h2>
+              <p className="text-lg text-muted-foreground mb-8">
+                Join thousands of developers who are already showcasing their work with Gitsink.
               </p>
-              <div className="mt-6 md:mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium border border-input shadow-sm hover:bg-accent hover:text-accent-foreground"
-                >
-                  Contact Us{" "}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="ml-2 h-4 w-4"
-                  >
-                    <path d="M5 12h14" />
-                    <path d="m12 5 7 7-7 7" />
-                  </svg>
-                </Link>
-                <Link
-                  href="/waitlist"
-                  className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
-                >
-                  Join Waitlist{" "}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="ml-2 h-4 w-4"
-                  >
-                    <path d="M5 12h14" />
-                    <path d="m12 5 7 7-7 7" />
-                  </svg>
-                </Link>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button size="lg" asChild className="group">
+                  <Link href="/waitlist">
+                    Join the Waitlist
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild>
+                  <Link href="/developer">Explore API</Link>
+                </Button>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* Simple Footer */}
-      <footer className="border-t py-6 md:py-0">
-        <div className="container flex flex-col items-center justify-between gap-4 md:h-24 md:flex-row">
-          <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
-            © 2023 Gitsink. All rights reserved.
-          </p>
-          <div className="flex items-center gap-4">
-            <Link href="/privacy" className="text-sm text-muted-foreground hover:underline">
-              Privacy
-            </Link>
-            <Link href="/terms" className="text-sm text-muted-foreground hover:underline">
-              Terms
-            </Link>
-            <Link href="/contact" className="text-sm text-muted-foreground hover:underline">
-              Contact
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }

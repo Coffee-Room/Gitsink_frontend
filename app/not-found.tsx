@@ -31,7 +31,7 @@ export default function NotFound() {
           </div>
           <div className="mt-12">
             <Link href="/" className="inline-flex items-center">
-              <Image src="/images/gitsink-icon.svg" alt="Gitsink Logo" width={32} height={32} className="h-8 w-auto" />
+              <Image src="/images/gitsink-logo-icon.png" alt="Gitsink Logo" width={32} height={32} className="h-8 w-auto" />
               <span className="ml-2 text-xl font-heading font-bold tracking-tight logo-text">Gitsink</span>
             </Link>
           </div>
