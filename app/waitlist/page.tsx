@@ -1,28 +1,20 @@
-import type { Metadata } from "next"
-import WaitlistHero from "@/components/waitlist/waitlist-hero"
-import WaitlistForm from "@/components/waitlist/waitlist-form"
-import Header from "@/components/layout/header"
-
-export const metadata: Metadata = {
-  title: "Join the Waitlist | Gitsink",
-  description:
-    "Sign up for early access to Gitsink, the next generation version control platform for modern development teams.",
-}
+import { Suspense } from "react"
+import { GetWaitlistForm } from "@/components/waitlist/getwaitlist-form"
+import { Header } from "@/components/layout/header"
+import { Footer } from "@/components/layout/footer"
 
 export default function WaitlistPage() {
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       <Header />
-      <main className="flex flex-col min-h-screen">
-        <WaitlistHero />
-        <section className="py-12 md:py-16 bg-muted/50">
-          <div className="container px-4 md:px-6">
-            <div className="max-w-xl mx-auto">
-              <WaitlistForm />
-            </div>
-          </div>
-        </section>
+      <main className="container mx-auto px-4 py-16">
+        <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)]">
+          <Suspense fallback={<div>Loading...</div>}>
+            <GetWaitlistForm />
+          </Suspense>
+        </div>
       </main>
-    </>
+      <Footer />
+    </div>
   )
 }
