@@ -1,48 +1,46 @@
 "use client"
 
-import { useTypewriter } from "@/hooks/use-typewriter"
-import { useIsMobile } from "@/hooks/use-is-mobile"
-import { useMemo } from "react"
+import { useEffect, useState } from "react"
+import { motion } from "framer-motion"
 
 interface AnimatedTextProps {
   text: string
   className?: string
-  speed?: number
   delay?: number
-  disableOnMobile?: boolean
 }
 
-export default function AnimatedText({
-  text,
-  className = "",
-  speed: initialSpeed = 50,
-  delay: initialDelay = 0,
-  disableOnMobile = false,
-}: AnimatedTextProps) {
-  const isMobile = useIsMobile()
+export function AnimatedText({ text, className = "", delay = 0 }: AnimatedTextProps) {
+  const [displayText, setDisplayText] = useState("")
+  const [currentIndex, setCurrentIndex] = useState(0)
 
-  const { speed, delay } = useMemo(() => {
-    let calculatedSpeed = initialSpeed
-    let calculatedDelay = initialDelay
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        setDisplayText((prev) => prev + text[currentIndex])
+        setCurrentIndex((prev) => prev + 1)
+      }, 50 + delay)
 
-    if (isMobile) {
-      if (disableOnMobile) {
-        return { speed: 0, delay: 0 } // Effectively disable animation
-      }
-
-      // Faster typing on mobile
-      calculatedSpeed = Math.max(20, initialSpeed / 2)
-      calculatedDelay = Math.min(initialDelay, 300)
+      return () => clearTimeout(timeout)
     }
+  }, [currentIndex, text, delay])
 
-    return { speed: calculatedSpeed, delay: calculatedDelay }
-  }, [isMobile, disableOnMobile, initialSpeed, initialDelay])
-
-  const { displayText } = useTypewriter({ text, speed, delay })
-
-  if (isMobile && disableOnMobile) {
-    return <span className={className}>{text}</span>
-  }
-
-  return <span className={className}>{displayText}</span>
+  return (
+    <motion.span
+      className={className}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: delay / 1000 }}
+    >
+      {displayText}
+      {currentIndex < text.length && (
+        <motion.span
+          animate={{ opacity: [1, 0] }}
+          transition={{ duration: 0.8, repeat: Number.POSITIVE_INFINITY }}
+          className="inline-block w-0.5 h-5 bg-current ml-1"
+        />
+      )}
+    </motion.span>
+  )
 }
+
+export default AnimatedText

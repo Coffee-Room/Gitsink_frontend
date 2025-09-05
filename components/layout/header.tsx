@@ -3,16 +3,10 @@
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
-import { LanguageSelector } from "@/components/ui/language-selector"
 import MobileMenu from "@/components/layout/mobile-menu"
-import { useLanguage } from "@/contexts/language-context"
-import { siteTranslations } from "@/lib/translations/site"
+import { ThemeToggle } from "@/components/ui/theme-toggle"
 
 export function Header() {
-  const { currentLanguage } = useLanguage()
-  const t = siteTranslations[currentLanguage]?.nav || siteTranslations.en.nav
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 md:h-20 items-center justify-between px-4 md:px-6">
@@ -34,40 +28,39 @@ export function Header() {
             href="/how-it-works"
             className="text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all hover:after:w-full"
           >
-            {t.howItWorks}
+            How It Works
           </Link>
           <Link
             href="/features"
             className="text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all hover:after:w-full"
           >
-            {t.features}
+            Features
           </Link>
           <Link
             href="/developer"
             className="text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all hover:after:w-full"
           >
-            {t.developer}
+            Developers
           </Link>
           <Link
             href="/faq"
             className="text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all hover:after:w-full"
           >
-            {t.faq}
+            FAQ
           </Link>
           <Link
             href="/status"
             className="text-sm font-medium text-muted-foreground transition-all duration-200 hover:text-foreground relative after:absolute after:left-0 after:bottom-0 after:h-0.5 after:w-0 after:bg-foreground after:transition-all hover:after:w-full"
           >
-            {t.status}
+            Status
           </Link>
         </nav>
 
         <div className="flex items-center justify-end space-x-2">
-          <LanguageSelector />
           <ThemeToggle />
           <Link href="/waitlist" className="hidden md:inline-flex">
             <Button className="bg-black hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 text-white transition-all duration-200 hover:scale-105">
-              {t.waitlist}
+              Join Waitlist
             </Button>
           </Link>
           <MobileMenu />

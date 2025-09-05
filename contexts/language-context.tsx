@@ -1,66 +1,81 @@
 "use client"
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import {
-  type SupportedLanguage,
-  detectUserRegion,
-  getBrowserLanguage,
-  getStoredLanguage,
-  setStoredLanguage,
-} from "@/lib/language-detection"
+import type React from "react"
 
-interface LanguageContextType {
-  currentLanguage: SupportedLanguage
-  setLanguage: (language: SupportedLanguage) => void
-  isLoading: boolean
+import { createContext, useContext, useState, useEffect } from "react"
+
+type Language = {
+  code: string
+  name: string
+  nativeName: string
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
+type LanguageContextType = {
+  currentLanguage: Language
+  setLanguage: (code: string) => void
+  languages: Language[]
+}
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>("en")
-  const [isLoading, setIsLoading] = useState(true)
+const languages: Language[] = [
+  { code: "en", name: "English", nativeName: "English" },
+  { code: "es", name: "Spanish", nativeName: "Español" },
+  { code: "fr", name: "French", nativeName: "Français" },
+  { code: "de", name: "German", nativeName: "Deutsch" },
+  { code: "nl", name: "Dutch", nativeName: "Nederlands" },
+  { code: "ja", name: "Japanese", nativeName: "日本語" },
+]
+
+// Default to English
+const defaultLanguage = languages[0]
+
+const LanguageContext = createContext<LanguageContextType>({
+  currentLanguage: defaultLanguage,
+  setLanguage: () => {},
+  languages: languages,
+})
+
+export function LanguageProvider({ children }: { children: React.ReactNode }) {
+  const [currentLanguage, setCurrentLanguage] = useState<Language>(defaultLanguage)
+  const [isInitialized, setIsInitialized] = useState(false)
 
   useEffect(() => {
-    async function initializeLanguage() {
-      try {
-        // Check for stored preference first
-        const storedLanguage = getStoredLanguage()
-        if (storedLanguage) {
-          setCurrentLanguage(storedLanguage)
-          setIsLoading(false)
-          return
+    try {
+      // Only access localStorage on client side
+      if (typeof window !== "undefined") {
+        const savedLanguage = localStorage.getItem("language")
+        if (savedLanguage) {
+          const languageObj = languages.find((lang) => lang.code === savedLanguage)
+          if (languageObj) {
+            setCurrentLanguage(languageObj)
+          }
         }
-
-        // Try to detect region
-        const regionInfo = await detectUserRegion()
-        setCurrentLanguage(regionInfo.language)
-      } catch (error) {
-        // Fallback to browser language
-        const browserLang = getBrowserLanguage()
-        setCurrentLanguage(browserLang)
-      } finally {
-        setIsLoading(false)
       }
+    } catch (error) {
+      console.error("Error accessing localStorage:", error)
+    } finally {
+      setIsInitialized(true)
     }
-
-    initializeLanguage()
   }, [])
 
-  const setLanguage = (language: SupportedLanguage) => {
-    setCurrentLanguage(language)
-    setStoredLanguage(language)
+  const setLanguage = (code: string) => {
+    try {
+      const languageObj = languages.find((lang) => lang.code === code)
+      if (languageObj) {
+        setCurrentLanguage(languageObj)
+        // Only access localStorage on client side
+        if (typeof window !== "undefined") {
+          localStorage.setItem("language", code)
+        }
+      }
+    } catch (error) {
+      console.error("Error setting language:", error)
+    }
   }
 
+  // Always render children, but with default language during SSR
   return (
-    <LanguageContext.Provider value={{ currentLanguage, setLanguage, isLoading }}>{children}</LanguageContext.Provider>
+    <LanguageContext.Provider value={{ currentLanguage, setLanguage, languages }}>{children}</LanguageContext.Provider>
   )
 }
 
-export function useLanguage() {
-  const context = useContext(LanguageContext)
-  if (context === undefined) {
-    throw new Error("useLanguage must be used within a LanguageProvider")
-  }
-  return context
-}
+export const useLanguage = () => useContext(LanguageContext)
