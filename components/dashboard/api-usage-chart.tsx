@@ -1,174 +1,145 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { ArrowUpRight, ArrowDownRight, TrendingUp } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { Calendar, TrendingUp, Activity, AlertCircle } from "lucide-react"
 
-// Mock data generator for API usage
-const generateMockData = (days: number, startDate = new Date()) => {
+// Mock data for API usage
+const generateMockData = (days: number) => {
   const data = []
-  const date = new Date(startDate)
-  date.setDate(date.getDate() - days)
+  const now = new Date()
 
-  for (let i = 0; i <= days; i++) {
-    const nextDate = new Date(date)
-    nextDate.setDate(date.getDate() + i)
-
-    // Generate more realistic data with weekly patterns
-    const dayOfWeek = nextDate.getDay()
-    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
-
-    // Base value with some randomness
-    let baseValue = isWeekend
-      ? Math.floor(Math.random() * 500) + 100
-      : // Lower on weekends
-        Math.floor(Math.random() * 1500) + 500 // Higher on weekdays
-
-    // Add some trend (increasing over time)
-    baseValue += Math.floor(i * 5)
+  for (let i = days - 1; i >= 0; i--) {
+    const date = new Date(now)
+    date.setDate(date.getDate() - i)
 
     data.push({
-      date: nextDate.toISOString().split("T")[0],
-      requests: baseValue,
-      errors: Math.floor(baseValue * (Math.random() * 0.05)), // 0-5% error rate
+      date: date.toISOString().split("T")[0],
+      requests: Math.floor(Math.random() * 1000) + 200,
+      errors: Math.floor(Math.random() * 50) + 5,
     })
   }
 
   return data
 }
 
-type TimeRange = "7d" | "30d" | "90d"
+interface ApiUsageChartProps {
+  className?: string
+}
 
-export default function ApiUsageChart() {
-  const [timeRange, setTimeRange] = useState<TimeRange>("30d")
+export default function ApiUsageChart({ className }: ApiUsageChartProps) {
+  const [timeRange, setTimeRange] = useState<"7d" | "30d" | "90d">("7d")
 
-  const chartData = useMemo(() => {
-    const days = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90
-    return generateMockData(days)
-  }, [timeRange])
+  const data = generateMockData(timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : 90)
 
-  // Calculate total requests and change percentage
-  const totalRequests = chartData.reduce((sum, day) => sum + day.requests, 0)
-  const firstHalf = chartData.slice(0, Math.floor(chartData.length / 2))
-  const secondHalf = chartData.slice(Math.floor(chartData.length / 2))
+  const totalRequests = data.reduce((sum, day) => sum + day.requests, 0)
+  const totalErrors = data.reduce((sum, day) => sum + day.errors, 0)
+  const avgDailyRequests = Math.round(totalRequests / data.length)
+  const errorRate = ((totalErrors / totalRequests) * 100).toFixed(2)
 
-  const firstHalfTotal = firstHalf.reduce((sum, day) => sum + day.requests, 0)
-  const secondHalfTotal = secondHalf.reduce((sum, day) => sum + day.requests, 0)
-
-  const changePercentage =
-    firstHalfTotal === 0 ? 100 : Math.round(((secondHalfTotal - firstHalfTotal) / firstHalfTotal) * 100)
-
-  // Format date for x-axis
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr)
-    return timeRange === "7d"
-      ? date.toLocaleDateString("en-US", { weekday: "short" })
-      : date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
-  }
+  // Calculate growth percentage (mock)
+  const growthPercentage = Math.floor(Math.random() * 20) + 5
 
   return (
-    <Card className="col-span-3">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div className="space-y-1">
-          <CardTitle>API Usage</CardTitle>
-          <CardDescription>Total requests over time</CardDescription>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Select value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)}>
-            <SelectTrigger className="h-8 w-[80px]">
-              <SelectValue placeholder="30 days" />
-            </SelectTrigger>
-            <SelectContent side="bottom">
-              <SelectItem value="7d">7 days</SelectItem>
-              <SelectItem value="30d">30 days</SelectItem>
-              <SelectItem value="90d">90 days</SelectItem>
-            </SelectContent>
-          </Select>
+    <Card className={className}>
+      <CardHeader className="pb-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Activity className="h-5 w-5" />
+              API Usage Overview
+            </CardTitle>
+            <CardDescription>Monitor your API requests and performance metrics</CardDescription>
+          </div>
+          <div className="flex gap-2">
+            <Button variant={timeRange === "7d" ? "default" : "outline"} size="sm" onClick={() => setTimeRange("7d")}>
+              7 days
+            </Button>
+            <Button variant={timeRange === "30d" ? "default" : "outline"} size="sm" onClick={() => setTimeRange("30d")}>
+              30 days
+            </Button>
+            <Button variant={timeRange === "90d" ? "default" : "outline"} size="sm" onClick={() => setTimeRange("90d")}>
+              90 days
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-muted-foreground">Total Requests</span>
-            <div className="flex items-baseline">
-              <span className="text-2xl font-bold">{totalRequests.toLocaleString()}</span>
-              <div
-                className={`ml-2 flex items-center text-xs font-medium ${changePercentage >= 0 ? "text-green-500" : "text-red-500"}`}
-              >
-                {changePercentage >= 0 ? (
-                  <ArrowUpRight className="h-3 w-3 mr-1" />
-                ) : (
-                  <ArrowDownRight className="h-3 w-3 mr-1" />
-                )}
-                {Math.abs(changePercentage)}%
-              </div>
+        <div className="grid gap-4 md:grid-cols-3 mb-6">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-green-500" />
+              <span className="text-sm font-medium">Total Requests</span>
+            </div>
+            <div className="text-2xl font-bold">{totalRequests.toLocaleString()}</div>
+            <div className="flex items-center gap-1">
+              <Badge variant="secondary" className="text-xs">
+                +{growthPercentage}%
+              </Badge>
+              <span className="text-xs text-muted-foreground">vs last period</span>
             </div>
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-muted-foreground">Average Daily</span>
-            <span className="text-2xl font-bold">{Math.round(totalRequests / chartData.length).toLocaleString()}</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-muted-foreground">Success Rate</span>
-            <div className="flex items-baseline">
-              <span className="text-2xl font-bold">
-                {(100 - (chartData.reduce((sum, day) => sum + day.errors, 0) / totalRequests) * 100).toFixed(2)}%
-              </span>
-              <TrendingUp className="h-3 w-3 ml-2 text-green-500" />
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-blue-500" />
+              <span className="text-sm font-medium">Avg Daily</span>
             </div>
+            <div className="text-2xl font-bold">{avgDailyRequests.toLocaleString()}</div>
+            <div className="text-xs text-muted-foreground">requests per day</div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-orange-500" />
+              <span className="text-sm font-medium">Success Rate</span>
+            </div>
+            <div className="text-2xl font-bold">{(100 - Number.parseFloat(errorRate)).toFixed(1)}%</div>
+            <div className="text-xs text-muted-foreground">{errorRate}% error rate</div>
           </div>
         </div>
 
-        <div className="h-[300px]">
-          <ChartContainer
-            config={{
-              requests: {
-                label: "API Requests",
-                color: "hsl(var(--chart-1))",
-              },
-              errors: {
-                label: "Errors",
-                color: "hsl(var(--destructive))",
-              },
-            }}
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 5, right: 5, left: 5, bottom: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={formatDate}
-                  tick={{ fontSize: 12 }}
-                  tickMargin={8}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 12 }}
-                  tickMargin={8}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(value) => (value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value)}
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar
-                  dataKey="requests"
-                  name="API Requests"
-                  radius={[4, 4, 0, 0]}
-                  barSize={timeRange === "90d" ? 2 : timeRange === "30d" ? 8 : 20}
-                />
-                <Bar
-                  dataKey="errors"
-                  name="Errors"
-                  radius={[4, 4, 0, 0]}
-                  barSize={timeRange === "90d" ? 2 : timeRange === "30d" ? 8 : 20}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartContainer>
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+              <XAxis
+                dataKey="date"
+                className="text-xs fill-muted-foreground"
+                tickFormatter={(value) => {
+                  const date = new Date(value)
+                  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                }}
+              />
+              <YAxis className="text-xs fill-muted-foreground" />
+              <Tooltip
+                content={({ active, payload, label }) => {
+                  if (active && payload && payload.length) {
+                    const date = new Date(label)
+                    return (
+                      <div className="rounded-lg border bg-background p-3 shadow-md">
+                        <p className="font-medium">
+                          {date.toLocaleDateString("en-US", {
+                            weekday: "long",
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </p>
+                        <p className="text-sm text-blue-600">Requests: {payload[0]?.value?.toLocaleString()}</p>
+                        <p className="text-sm text-red-600">Errors: {payload[1]?.value?.toLocaleString()}</p>
+                      </div>
+                    )
+                  }
+                  return null
+                }}
+              />
+              <Bar dataKey="requests" fill="hsl(var(--primary))" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="errors" fill="hsl(var(--destructive))" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </CardContent>
     </Card>

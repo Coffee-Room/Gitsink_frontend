@@ -7,16 +7,20 @@ interface WelcomeHeaderProps {
 }
 
 export default function WelcomeHeader({ name, username, avatarUrl }: WelcomeHeaderProps) {
+  // Safely get the first name and first character with fallbacks
+  const firstName = name && typeof name === "string" ? name.split(" ")[0] : "User"
+  const avatarFallback = name && typeof name === "string" && name.length > 0 ? name.charAt(0).toUpperCase() : "U"
+
   return (
     <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-4">
         <Avatar className="h-16 w-16 border-2 border-border">
-          <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={name} />
-          <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+          <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={name || "User"} />
+          <AvatarFallback>{avatarFallback}</AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Welcome back, {name.split(" ")[0]}!</h1>
-          <p className="text-sm text-muted-foreground">@{username}</p>
+          <h1 className="text-2xl font-bold tracking-tight">Welcome back, {firstName}!</h1>
+          <p className="text-sm text-muted-foreground">@{username || "user"}</p>
         </div>
       </div>
       <div className="mt-4 sm:mt-0">

@@ -3,9 +3,13 @@ import { Button } from "@/components/ui/button"
 import { PlayCircle } from "lucide-react"
 import Link from "next/link"
 
-export default function SandboxCard() {
+interface SandboxCardProps {
+  className?: string
+}
+
+export default function SandboxCard({ className }: SandboxCardProps) {
   return (
-    <Card>
+    <Card className={className}>
       <CardHeader className="pb-3">
         <CardTitle>API Sandbox</CardTitle>
         <CardDescription>Test your API integration in a live environment</CardDescription>
